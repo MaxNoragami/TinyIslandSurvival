@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://erd5qpm8sraw"]
+
+[ext_resource type="PackedScene" uid="uid://x4w6s15w1q3" path="res://Scenes/world.tscn" id="1_ebmjs"]
+[ext_resource type="PackedScene" uid="uid://cpboxjdnfs5u2" path="res://Scenes/player.tscn" id="2_qxrlw"]
+
+[node name="Game" type="Node"]
+
+[node name="World" parent="." instance=ExtResource("1_ebmjs")]
+position = Vector2(23, -12)
+metadata/_edit_lock_ = true
+
+[node name="Player" parent="." instance=ExtResource("2_qxrlw")]
+position = Vector2(1417, 85)
