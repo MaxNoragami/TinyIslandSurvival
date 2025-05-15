@@ -11,6 +11,7 @@
 visible = false
 
 [node name="InventoryUI" parent="CanvasLayer" instance=ExtResource("1_3dryh")]
+metadata/_edit_lock_ = true
 
 [node name="World" parent="." instance=ExtResource("1_ebmjs")]
 position = Vector2(23, -12)
