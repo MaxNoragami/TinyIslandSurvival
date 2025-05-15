@@ -1,0 +1,130 @@
+[gd_scene load_steps=4 format=3 uid="uid://biuw3yy44r8vd"]
+
+[ext_resource type="PackedScene" uid="uid://c4itjloynmsyn" path="res://Scenes/inventory_slot.tscn" id="1_8su62"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_15l1e"]
+bg_color = Color(0.839216, 0.631373, 0.392157, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+corner_detail = 2
+
+[sub_resource type="Theme" id="Theme_8su62"]
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_15l1e")
+
+[node name="InventoryUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="OutMargin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 350
+theme_override_constants/margin_top = 200
+theme_override_constants/margin_right = 350
+theme_override_constants/margin_bottom = 200
+
+[node name="InventoryBg" type="PanelContainer" parent="OutMargin"]
+layout_mode = 2
+theme = SubResource("Theme_8su62")
+
+[node name="InMargin" type="MarginContainer" parent="OutMargin/InventoryBg"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="GridContainer" type="GridContainer" parent="OutMargin/InventoryBg/InMargin"]
+layout_mode = 2
+theme_override_constants/h_separation = 15
+theme_override_constants/v_separation = 15
+columns = 6
+
+[node name="InventorySlot" parent="OutMargin/InventoryBg/InMargin/GridContainer" instance=ExtResource("1_8su62")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="InventorySlot2" parent="OutMargin/InventoryBg/InMargin/GridContainer" instance=ExtResource("1_8su62")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="InventorySlot3" parent="OutMargin/InventoryBg/InMargin/GridContainer" instance=ExtResource("1_8su62")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="InventorySlot4" parent="OutMargin/InventoryBg/InMargin/GridContainer" instance=ExtResource("1_8su62")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="InventorySlot5" parent="OutMargin/InventoryBg/InMargin/GridContainer" instance=ExtResource("1_8su62")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="InventorySlot6" parent="OutMargin/InventoryBg/InMargin/GridContainer" instance=ExtResource("1_8su62")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="InventorySlot7" parent="OutMargin/InventoryBg/InMargin/GridContainer" instance=ExtResource("1_8su62")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="InventorySlot8" parent="OutMargin/InventoryBg/InMargin/GridContainer" instance=ExtResource("1_8su62")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="InventorySlot9" parent="OutMargin/InventoryBg/InMargin/GridContainer" instance=ExtResource("1_8su62")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="InventorySlot10" parent="OutMargin/InventoryBg/InMargin/GridContainer" instance=ExtResource("1_8su62")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="InventorySlot11" parent="OutMargin/InventoryBg/InMargin/GridContainer" instance=ExtResource("1_8su62")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="InventorySlot12" parent="OutMargin/InventoryBg/InMargin/GridContainer" instance=ExtResource("1_8su62")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="InventorySlot13" parent="OutMargin/InventoryBg/InMargin/GridContainer" instance=ExtResource("1_8su62")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="InventorySlot14" parent="OutMargin/InventoryBg/InMargin/GridContainer" instance=ExtResource("1_8su62")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="InventorySlot15" parent="OutMargin/InventoryBg/InMargin/GridContainer" instance=ExtResource("1_8su62")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="InventorySlot16" parent="OutMargin/InventoryBg/InMargin/GridContainer" instance=ExtResource("1_8su62")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="InventorySlot17" parent="OutMargin/InventoryBg/InMargin/GridContainer" instance=ExtResource("1_8su62")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="InventorySlot18" parent="OutMargin/InventoryBg/InMargin/GridContainer" instance=ExtResource("1_8su62")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2

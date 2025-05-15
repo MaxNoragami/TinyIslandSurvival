@@ -1,4 +1,4 @@
-[gd_scene load_steps=85 format=3 uid="uid://cpboxjdnfs5u2"]
+[gd_scene load_steps=87 format=3 uid="uid://cpboxjdnfs5u2"]
 
 [ext_resource type="Script" uid="uid://r22wf5tfkggs" path="res://Scripts/player.gd" id="1_v0iea"]
 [ext_resource type="Texture2D" uid="uid://btuvbecudn006" path="res://Assets/Player/Player_Actions.png" id="2_6t5aa"]
@@ -6,6 +6,11 @@
 [ext_resource type="Script" uid="uid://8owgy5xd1yy0" path="res://Scripts/state_machine.gd" id="4_x3wgy"]
 [ext_resource type="Script" uid="uid://6kkgap4g1bss" path="res://Scripts/idle_state.gd" id="5_3smsa"]
 [ext_resource type="Script" uid="uid://biku467aprx0b" path="res://Scripts/move_state.gd" id="6_8erm5"]
+[ext_resource type="Script" uid="uid://dry5ni6xjdkby" path="res://Scripts/health_component.gd" id="7_8erm5"]
+[ext_resource type="Script" uid="uid://dn7al0ge7nn5y" path="res://Scripts/hitbox_component.gd" id="8_f1ek2"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6t5aa"]
+size = Vector2(13, 20)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_l6n3p"]
 atlas = ExtResource("2_6t5aa")
@@ -652,20 +657,28 @@ animations = [{
 "speed": 5.0
 }]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_6t5aa"]
-size = Vector2(13, 20)
-
 [node name="Player" type="CharacterBody2D"]
+collision_mask = 5
 script = ExtResource("1_v0iea")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-0.5, -1)
+shape = SubResource("RectangleShape2D_6t5aa")
+
+[node name="HitboxComponent" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 2
+script = ExtResource("8_f1ek2")
+metadata/_custom_type_script = "uid://dn7al0ge7nn5y"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxComponent"]
+position = Vector2(-0.5, -1)
+shape = SubResource("RectangleShape2D_6t5aa")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_l6n3p")
 animation = &"idle_front"
 autoplay = "idle_front"
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(-0.5, -1)
-shape = SubResource("RectangleShape2D_6t5aa")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(4, 4)
@@ -682,3 +695,7 @@ metadata/_custom_type_script = "uid://6kkgap4g1bss"
 [node name="MoveState" type="Node" parent="StateMachine"]
 script = ExtResource("6_8erm5")
 metadata/_custom_type_script = "uid://biku467aprx0b"
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("7_8erm5")
+metadata/_custom_type_script = "uid://dry5ni6xjdkby"

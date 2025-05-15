@@ -12,6 +12,10 @@ var sprite
 var facing_direction = "front"
 var last_animation = ""
 
+# Inventory system
+var inventory = {}
+@export var max_stack_size: int = 99
+
 func _ready():
     # Get references to components
     health_component = $HealthComponent if has_node("HealthComponent") else null
@@ -28,6 +32,9 @@ func _ready():
         state_machine.initialize(self)
     else:
         push_error("StateMachine not found on Player - make sure to add it as a child node")
+    
+    # Set up collision mask to detect pickups (Layer 3)
+    collision_mask |= 4  # Add Layer 3 (pickup layer) to collision mask
 
 func _physics_process(delta):
     # Let the state machine handle most of the logic
@@ -83,3 +90,57 @@ func play_animation(state_name):
                 last_animation = anim
         else:
             print("Animation not found: ", anim)
+
+# Handle taking damage
+func take_damage(amount):
+    if health_component:
+        health_component.take_damage(amount)
+        if not health_component.is_alive():
+            die()
+    
+# Handle healing
+func heal(amount):
+    if health_component:
+        health_component.heal(amount)
+        
+# Handle death
+func die():
+    if sprite and sprite.sprite_frames.has_animation("death"):
+        sprite.play("death")
+    # Could add more death handling logic here
+    
+# Apply knockback when hit
+func apply_knockback(direction):
+    velocity = direction
+    move_and_slide()
+
+# Inventory management
+func add_to_inventory(item_name: String, amount: int = 1):
+    if item_name in inventory:
+        inventory[item_name] = min(inventory[item_name] + amount, max_stack_size)
+    else:
+        inventory[item_name] = amount
+    
+    print("Added to inventory: ", item_name, " x", amount)
+    print("Inventory: ", inventory)
+    
+    # You could emit a signal here for UI updates
+    
+func remove_from_inventory(item_name: String, amount: int = 1):
+    if item_name in inventory:
+        inventory[item_name] -= amount
+        
+        if inventory[item_name] <= 0:
+            # Remove the item completely if amount is zero or negative
+            inventory.erase(item_name)
+        
+        print("Removed from inventory: ", item_name, " x", amount)
+        print("Inventory: ", inventory)
+        return true
+    return false
+
+func has_item(item_name: String, amount: int = 1):
+    return item_name in inventory and inventory[item_name] >= amount
+    
+func get_inventory():
+    return inventory
