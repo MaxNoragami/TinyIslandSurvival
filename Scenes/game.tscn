@@ -8,6 +8,7 @@
 [node name="Game" type="Node"]
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
+visible = false
 
 [node name="InventoryUI" parent="CanvasLayer" instance=ExtResource("1_3dryh")]
 metadata/_edit_lock_ = true
