@@ -11,6 +11,13 @@ const resource_data = {
 	# Add more resources here as needed
 }
 
+# Map item names to their scene paths
+const item_scenes = {
+	"Wood": "res://Scenes/wood.tscn",
+	"Rock": "res://Scenes/rock.tscn",
+	# Add more items here as needed
+}
+
 # Store references to our inventory slots
 var inventory_slots = []
 var player_ref = null
@@ -230,7 +237,57 @@ func _on_drop_button_pressed(slot):
 		
 		# Remove one of the item from inventory
 		if player_ref.has_method("remove_from_inventory"):
-			player_ref.remove_from_inventory(item_name, 1)
+			var success = player_ref.remove_from_inventory(item_name, 1)
+			
+			if success:
+				# Spawn the physical item in the world
+				spawn_dropped_item(item_name)
 			
 			# Update inventory display
 			_update_inventory_display()
+
+# Spawn a physical item in the world at a random position near the player
+func spawn_dropped_item(item_name: String):
+	if not item_scenes.has(item_name) or not player_ref:
+		return
+		
+	# Load the item scene
+	var item_scene = load(item_scenes[item_name])
+	if not item_scene:
+		push_warning("Failed to load scene for item: " + item_name)
+		return
+		
+	# Instance the scene
+	var item_instance = item_scene.instantiate()
+	
+	# Calculate random position around player (20-40 pixels away)
+	var random_angle = randf() * 2 * PI  # Random angle in radians
+	var random_distance = randf_range(20, 40)  # Random distance between 20-40 pixels
+	var offset = Vector2(cos(random_angle), sin(random_angle)) * random_distance
+	
+	# Set the position
+	item_instance.position = player_ref.global_position + offset
+	
+	# Add to the world
+	var world = player_ref.get_parent()
+	if world:
+		# Look for the PickableItems node to keep things organized
+		var pickable_items = world.get_node_or_null("PickableItems")
+		
+		if pickable_items:
+			# Check if there's a category node for this item type
+			var category_name = item_name + "Items"  # e.g. "WoodItems"
+			var category = pickable_items.get_node_or_null(category_name)
+			
+			if category:
+				category.add_child(item_instance)
+			else:
+				pickable_items.add_child(item_instance)
+		else:
+			# Just add to the world if we can't find PickableItems
+			world.add_child(item_instance)
+			
+		print("DEBUG: Spawned " + item_name + " at position " + str(item_instance.position))
+	else:
+		push_warning("Could not find a valid parent for dropped item")
+		item_instance.queue_free()
