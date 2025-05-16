@@ -10,7 +10,7 @@
 [ext_resource type="Script" uid="uid://dn7al0ge7nn5y" path="res://Scripts/hitbox_component.gd" id="8_f1ek2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6t5aa"]
-size = Vector2(13, 20)
+size = Vector2(13, 9)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_l6n3p"]
 atlas = ExtResource("2_6t5aa")
@@ -662,7 +662,7 @@ collision_mask = 5
 script = ExtResource("1_v0iea")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(-0.5, -1)
+position = Vector2(-0.5, 4.5)
 shape = SubResource("RectangleShape2D_6t5aa")
 
 [node name="HitboxComponent" type="Area2D" parent="."]
@@ -676,6 +676,7 @@ position = Vector2(-0.5, -1)
 shape = SubResource("RectangleShape2D_6t5aa")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+z_index = 1
 sprite_frames = SubResource("SpriteFrames_l6n3p")
 animation = &"idle_front"
 autoplay = "idle_front"

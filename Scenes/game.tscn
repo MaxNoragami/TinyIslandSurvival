@@ -5,7 +5,11 @@
 [ext_resource type="PackedScene" uid="uid://byqjcujelepvd" path="res://Scenes/craft_menu.tscn" id="2_i6g32"]
 [ext_resource type="PackedScene" uid="uid://cpboxjdnfs5u2" path="res://Scenes/player.tscn" id="2_qxrlw"]
 [ext_resource type="PackedScene" uid="uid://mpfurnu554th" path="res://Scenes/wood.tscn" id="3_wrm1d"]
+
 [ext_resource type="PackedScene" uid="uid://dipv4rh4v4p32" path="res://Scenes/rock.tscn" id="5_wowpa"]
+[ext_resource type="PackedScene" uid="uid://ci5syb8ys8yes" path="res://Scenes/tree.tscn" id="5_wowpa"]
+[ext_resource type="Script" uid="uid://cxf765vmr58vu" path="res://Scripts/tree_spawner.gd" id="6_8128m"]
+
 
 [node name="Game" type="Node"]
 
@@ -30,6 +34,7 @@ position = Vector2(1417, 85)
 [node name="Wood" parent="PickableItems/WoodItems" instance=ExtResource("3_wrm1d")]
 position = Vector2(1422, 137)
 
+
 [node name="Wood2" parent="PickableItems/WoodItems" instance=ExtResource("3_wrm1d")]
 position = Vector2(1468, 114)
 
@@ -40,3 +45,11 @@ position = Vector2(1438, 112)
 
 [node name="Rock" parent="PickableItems/RockItems" instance=ExtResource("5_wowpa")]
 position = Vector2(1382, 146)
+
+[node name="Trees" type="Node" parent="."]
+script = ExtResource("6_8128m")
+tree_scene = ExtResource("5_wowpa")
+num_trees = 500
+min_distance_between_trees = 60
+max_spawn_percentage = 0.9
+
