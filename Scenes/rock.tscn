@@ -1,0 +1,37 @@
+[gd_scene load_steps=6 format=3 uid="uid://dipv4rh4v4p32"]
+
+[ext_resource type="Script" uid="uid://cm56dlug2rgkd" path="res://Scripts/resource.gd" id="1_1rhfe"]
+[ext_resource type="Texture2D" uid="uid://bfc7bh6qqpijg" path="res://Assets/Icons/16x16.png" id="2_1np5q"]
+[ext_resource type="Script" uid="uid://dn7al0ge7nn5y" path="res://Scripts/hitbox_component.gd" id="3_m11v4"]
+[ext_resource type="Script" uid="uid://jsd6o8omlw5a" path="res://Scripts/pickup_component.gd" id="4_b0k8d"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_8tt3v"]
+radius = 2.0
+height = 11.3698
+
+[node name="Rock" type="Node2D"]
+script = ExtResource("1_1rhfe")
+resource_name = "Rock"
+health = 5
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(0, 1)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_1np5q")
+region_enabled = true
+region_rect = Rect2(160, 304, 16, 16)
+
+[node name="HitboxComponent" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 3
+script = ExtResource("3_m11v4")
+metadata/_custom_type_script = "uid://dn7al0ge7nn5y"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxComponent"]
+rotation = 0.748142
+scale = Vector2(1.0427, 0.497186)
+shape = SubResource("CapsuleShape2D_8tt3v")
+
+[node name="PickupComponent" type="Node" parent="."]
+script = ExtResource("4_b0k8d")
+item_name = "Rock"

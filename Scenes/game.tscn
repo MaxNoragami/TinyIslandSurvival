@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://erd5qpm8sraw"]
+[gd_scene load_steps=6 format=3 uid="uid://erd5qpm8sraw"]
 
 [ext_resource type="PackedScene" uid="uid://biuw3yy44r8vd" path="res://Scenes/inventory_ui.tscn" id="1_3dryh"]
 [ext_resource type="PackedScene" uid="uid://x4w6s15w1q3" path="res://Scenes/world.tscn" id="1_ebmjs"]
 [ext_resource type="PackedScene" uid="uid://cpboxjdnfs5u2" path="res://Scenes/player.tscn" id="2_qxrlw"]
 [ext_resource type="PackedScene" uid="uid://mpfurnu554th" path="res://Scenes/wood.tscn" id="3_wrm1d"]
+[ext_resource type="PackedScene" uid="uid://dipv4rh4v4p32" path="res://Scenes/rock.tscn" id="5_wowpa"]
 
 [node name="Game" type="Node"]
 
@@ -19,11 +20,20 @@ metadata/_edit_lock_ = true
 [node name="Player" parent="." instance=ExtResource("2_qxrlw")]
 position = Vector2(1417, 85)
 
-[node name="Wood" parent="." instance=ExtResource("3_wrm1d")]
+[node name="PickableItems" type="Node" parent="."]
+
+[node name="WoodItems" type="Node" parent="PickableItems"]
+
+[node name="Wood" parent="PickableItems/WoodItems" instance=ExtResource("3_wrm1d")]
 position = Vector2(1422, 137)
 
-[node name="Wood2" parent="." instance=ExtResource("3_wrm1d")]
+[node name="Wood2" parent="PickableItems/WoodItems" instance=ExtResource("3_wrm1d")]
 position = Vector2(1468, 114)
 
-[node name="Wood3" parent="." instance=ExtResource("3_wrm1d")]
+[node name="Wood3" parent="PickableItems/WoodItems" instance=ExtResource("3_wrm1d")]
 position = Vector2(1438, 112)
+
+[node name="RockItems" type="Node" parent="PickableItems"]
+
+[node name="Rock" parent="PickableItems/RockItems" instance=ExtResource("5_wowpa")]
+position = Vector2(1382, 146)

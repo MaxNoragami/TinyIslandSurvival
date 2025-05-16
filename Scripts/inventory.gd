@@ -2,10 +2,12 @@ extends Node
 
 @onready var out_margin = $OutMargin
 @onready var grid_container = $OutMargin/InventoryBg/InMargin/GridContainer
+@onready var equip_slot = $EquipSlotContainer/InventorySlot
 
 # Resource textures and regions mapping
 const resource_data = {
 	"Wood": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(144, 192, 16, 16)},
+	"Rock": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(160, 304, 16, 16)},
 	# Add more resources here as needed
 }
 
@@ -15,19 +17,89 @@ var player_ref = null
 var find_player_attempts = 0
 var max_find_attempts = 5
 
+# Track currently selected slot
+var currently_selected_slot = null
+
 func _ready():
 	# Make sure the inventory is initially hidden
 	if out_margin:
 		out_margin.visible = false
+		
+		# Ensure mouse passes through when inventory is invisible
+		out_margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
-	# Get references to all inventory slots
+	# Ensure EquipSlotContainer doesn't block mouse when inventory is hidden
+	var equip_slot_container = $EquipSlotContainer
+	if equip_slot_container:
+		equip_slot_container.mouse_filter = Control.MOUSE_FILTER_PASS
+	
+	# Get references to all inventory slots and connect their buttons
 	if grid_container:
 		for child in grid_container.get_children():
 			if "InventorySlot" in child.name:
 				inventory_slots.append(child)
+				
+				# Connect the button toggled signal
+				var button = child.get_node_or_null("Button")
+				if button:
+					button.toggled.connect(_on_inventory_slot_toggled.bind(child))
 	
 	# Start looking for the player
 	find_player()
+	
+	# Clear the equip slot initially
+	clear_equip_slot()
+
+# Handle inventory slot toggle
+func _on_inventory_slot_toggled(button_pressed, slot):
+	if button_pressed:
+		# If a slot was already selected, untoggle it
+		if currently_selected_slot and currently_selected_slot != slot:
+			var prev_button = currently_selected_slot.get_node_or_null("Button")
+			if prev_button:
+				prev_button.button_pressed = false
+		
+		# Update the currently selected slot
+		currently_selected_slot = slot
+		
+		# Update equip slot with the selected item
+		update_equip_slot_from_selected()
+	else:
+		# If this was the selected slot, clear the equip slot
+		if currently_selected_slot == slot:
+			currently_selected_slot = null
+			clear_equip_slot()
+
+# Update the equip slot with the currently selected item
+func update_equip_slot_from_selected():
+	if currently_selected_slot and equip_slot:
+		var source_sprite = currently_selected_slot.get_node_or_null("CenterContainer/Panel/Sprite2D")
+		var source_label = currently_selected_slot.get_node_or_null("Label") 
+		var target_sprite = equip_slot.get_node_or_null("CenterContainer/Panel/Sprite2D")
+		var target_label = equip_slot.get_node_or_null("Label")
+		
+		if source_sprite and target_sprite:
+			# Copy texture and region
+			target_sprite.texture = source_sprite.texture
+			target_sprite.region_enabled = source_sprite.region_enabled
+			target_sprite.region_rect = source_sprite.region_rect
+		
+		if source_label and target_label:
+			# Copy amount
+			target_label.text = source_label.text
+
+# Clear the equip slot
+func clear_equip_slot():
+	if equip_slot:
+		var sprite = equip_slot.get_node_or_null("CenterContainer/Panel/Sprite2D")
+		var label = equip_slot.get_node_or_null("Label")
+		
+		if sprite:
+			sprite.texture = null
+			sprite.region_enabled = false
+		
+		if label:
+			label.text = ""
 
 func find_player():
 	await get_tree().process_frame
@@ -64,10 +136,24 @@ func toggle_inventory():
 	# Toggle the visibility of the OutMargin
 	if out_margin:
 		out_margin.visible = !out_margin.visible
+		
+		# Update mouse filter based on visibility
+		if out_margin.visible:
+			out_margin.mouse_filter = Control.MOUSE_FILTER_STOP
+		else:
+			out_margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 # Called when player inventory changes
 func _on_player_inventory_updated():
 	_update_inventory_display()
+	
+	# Reset selection when inventory changes
+	if currently_selected_slot:
+		var button = currently_selected_slot.get_node_or_null("Button")
+		if button:
+			button.button_pressed = false
+		currently_selected_slot = null
+		clear_equip_slot()
 
 # Update the UI to display player inventory
 func _update_inventory_display():
