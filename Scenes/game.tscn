@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://erd5qpm8sraw"]
+[gd_scene load_steps=8 format=3 uid="uid://erd5qpm8sraw"]
 
 [ext_resource type="PackedScene" uid="uid://biuw3yy44r8vd" path="res://Scenes/inventory_ui.tscn" id="1_3dryh"]
 [ext_resource type="PackedScene" uid="uid://x4w6s15w1q3" path="res://Scenes/world.tscn" id="1_ebmjs"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://dipv4rh4v4p32" path="res://Scenes/rock.tscn" id="5_wowpa"]
 [ext_resource type="PackedScene" uid="uid://ci5syb8ys8yes" path="res://Scenes/tree.tscn" id="5_wowpa"]
 [ext_resource type="Script" uid="uid://cxf765vmr58vu" path="res://Scripts/tree_spawner.gd" id="6_8128m"]
+[ext_resource type="Script" uid="uid://bkvpboislfeik" path="res://Scripts/ore_spawner.gd" id="7_1l0tm"]
 
 
 [node name="Game" type="Node"]
@@ -50,6 +51,12 @@ position = Vector2(1382, 146)
 script = ExtResource("6_8128m")
 tree_scene = ExtResource("5_wowpa")
 num_trees = 500
-min_distance_between_trees = 60
+min_distance_between_trees = 45.0
+min_distance_from_player = 50.0
 max_spawn_percentage = 0.9
+
+
+[node name="Ores" type="Node" parent="."]
+script = ExtResource("7_1l0tm")
+num_ores = 300
 

@@ -1,0 +1,28 @@
+[gd_scene load_steps=4 format=3 uid="uid://c4lj88uxy1frk"]
+
+[ext_resource type="Texture2D" uid="uid://d1nmuc8kutr6g" path="res://Assets/Outdoor decoration/Outdoor_Decor_Free.png" id="1_h3623"]
+[ext_resource type="Script" uid="uid://dn7al0ge7nn5y" path="res://Scripts/hitbox_component.gd" id="2_ywtp7"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_b7x5c"]
+radius = 9.0
+
+[node name="Iron" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_h3623")
+region_enabled = true
+region_rect = Rect2(0, 48, 16, 16)
+
+[node name="HitboxComponent" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 2
+script = ExtResource("2_ywtp7")
+metadata/_custom_type_script = "uid://dn7al0ge7nn5y"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxComponent"]
+shape = SubResource("CircleShape2D_b7x5c")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D"]
+polygon = PackedVector2Array(-7, 6, 0, 7, 7, 6, 6, -4, 1, -8, -5, -5)

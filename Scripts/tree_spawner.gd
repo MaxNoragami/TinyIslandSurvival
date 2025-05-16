@@ -123,7 +123,6 @@ func spawn_trees():
 		while batch_count < batch_size and spawned_trees < num_trees and max_attempts > 0 and spawn_positions.size() > 0:
 			max_attempts -= 1
 			batch_count += 1
-			
 			# Pick a random position from the available spawn positions
 			var pos_index = randi() % spawn_positions.size()
 			var base_pos = spawn_positions[pos_index]
