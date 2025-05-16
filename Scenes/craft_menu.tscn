@@ -1,0 +1,142 @@
+[gd_scene load_steps=7 format=3 uid="uid://byqjcujelepvd"]
+
+[ext_resource type="PackedScene" uid="uid://c4itjloynmsyn" path="res://Scenes/inventory_slot.tscn" id="1_yb8js"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_niquu"]
+bg_color = Color(0.839216, 0.631373, 0.392157, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+corner_detail = 2
+
+[sub_resource type="Theme" id="Theme_yb8js"]
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_niquu")
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_m2a0r"]
+
+[sub_resource type="Theme" id="Theme_t6oxa"]
+PanelContainer/styles/panel = SubResource("StyleBoxEmpty_m2a0r")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nvdjk"]
+bg_color = Color(0.721569, 0.529412, 0.321569, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+corner_detail = 1
+
+[node name="CraftMenu" type="Control"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="OutMargin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 350
+theme_override_constants/margin_top = 200
+theme_override_constants/margin_right = 350
+theme_override_constants/margin_bottom = 200
+
+[node name="CraftBg" type="PanelContainer" parent="OutMargin"]
+layout_mode = 2
+theme = SubResource("Theme_yb8js")
+
+[node name="InMargin" type="MarginContainer" parent="OutMargin/CraftBg"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="MainHBoxContainer" type="HBoxContainer" parent="OutMargin/CraftBg/InMargin"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="GridContainer" type="GridContainer" parent="OutMargin/CraftBg/InMargin/MainHBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 15
+theme_override_constants/v_separation = 15
+columns = 3
+
+[node name="CraftSlot" parent="OutMargin/CraftBg/InMargin/MainHBoxContainer/GridContainer" instance=ExtResource("1_yb8js")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="CraftSlot2" parent="OutMargin/CraftBg/InMargin/MainHBoxContainer/GridContainer" instance=ExtResource("1_yb8js")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="CraftSlot3" parent="OutMargin/CraftBg/InMargin/MainHBoxContainer/GridContainer" instance=ExtResource("1_yb8js")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="CraftSlot4" parent="OutMargin/CraftBg/InMargin/MainHBoxContainer/GridContainer" instance=ExtResource("1_yb8js")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="CraftSlot5" parent="OutMargin/CraftBg/InMargin/MainHBoxContainer/GridContainer" instance=ExtResource("1_yb8js")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="CraftSlot6" parent="OutMargin/CraftBg/InMargin/MainHBoxContainer/GridContainer" instance=ExtResource("1_yb8js")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="CraftSlot7" parent="OutMargin/CraftBg/InMargin/MainHBoxContainer/GridContainer" instance=ExtResource("1_yb8js")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="CraftSlot8" parent="OutMargin/CraftBg/InMargin/MainHBoxContainer/GridContainer" instance=ExtResource("1_yb8js")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="CraftSlot9" parent="OutMargin/CraftBg/InMargin/MainHBoxContainer/GridContainer" instance=ExtResource("1_yb8js")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+
+[node name="SubHBoxContainer" type="HBoxContainer" parent="OutMargin/CraftBg/InMargin/MainHBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="Label" type="Label" parent="OutMargin/CraftBg/InMargin/MainHBoxContainer/SubHBoxContainer"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 60
+text = "=>"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Separator" type="PanelContainer" parent="OutMargin/CraftBg/InMargin/MainHBoxContainer/SubHBoxContainer"]
+custom_minimum_size = Vector2(25, 0)
+layout_mode = 2
+theme = SubResource("Theme_t6oxa")
+
+[node name="ResultSlot" parent="OutMargin/CraftBg/InMargin/MainHBoxContainer/SubHBoxContainer" instance=ExtResource("1_yb8js")]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_nvdjk")

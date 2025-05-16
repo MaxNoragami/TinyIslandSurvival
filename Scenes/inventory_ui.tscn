@@ -44,6 +44,7 @@ size_flags_vertical = 3
 script = ExtResource("1_os1l6")
 
 [node name="OutMargin" type="MarginContainer" parent="."]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
