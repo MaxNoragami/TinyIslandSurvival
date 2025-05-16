@@ -57,6 +57,7 @@ func _on_body_entered(body):
 # Call this to trigger the pickup
 func trigger_pickup(collector = null):
     if not can_be_picked_up:
+        print("DEBUG: Item cannot be picked up")
         return
         
     # Prepare the item data
@@ -64,6 +65,8 @@ func trigger_pickup(collector = null):
         "name": item_name if item_name else parent_object.name,
         "quantity": item_quantity
     }
+    
+    print("DEBUG: PickupComponent trigger_pickup - Item: ", item_data.name, " Qty: ", item_data.quantity)
     
     # Play pickup sound if specified
     if pickup_sound_path != "":
@@ -77,7 +80,15 @@ func trigger_pickup(collector = null):
     
     # If collector has inventory function, call it directly
     if collector and collector.has_method("add_to_inventory"):
-        collector.add_to_inventory(item_data.name, item_data.quantity)
+        print("DEBUG: Found collector with add_to_inventory method: ", collector.name)
+        print("DEBUG: Adding to collector's inventory: ", item_data.name)
+        var success = collector.add_to_inventory(item_data.name, item_data.quantity)
+        print("DEBUG: Item added successfully: ", success)
+    else:
+        print("DEBUG: Collector does not have add_to_inventory method or is null")
+        if collector:
+            print("DEBUG: Collector type: ", collector.get_class())
+            print("DEBUG: Collector methods: ", collector.get_method_list())
     
     # Emit signal for inventory system to handle
     emit_signal("item_picked_up", item_data)

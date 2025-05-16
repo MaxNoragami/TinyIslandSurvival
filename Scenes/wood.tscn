@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://mpfurnu554th"]
+[gd_scene load_steps=6 format=3 uid="uid://mpfurnu554th"]
 
-[ext_resource type="Script" uid="uid://jb1bjdu0dp2p" path="res://Scripts/resource.gd" id="1_gkese"]
+[ext_resource type="Script" uid="uid://cm56dlug2rgkd" path="res://Scripts/resource.gd" id="1_gkese"]
 [ext_resource type="Texture2D" uid="uid://bfc7bh6qqpijg" path="res://Assets/Icons/16x16.png" id="1_wy180"]
 [ext_resource type="Script" uid="uid://dn7al0ge7nn5y" path="res://Scripts/hitbox_component.gd" id="3_4vtod"]
+[ext_resource type="Script" uid="uid://jsd6o8omlw5a" path="res://Scripts/pickup_component.gd" id="4_76v5j"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_8tt3v"]
 radius = 2.0
@@ -19,10 +20,16 @@ region_rect = Rect2(144, 192, 16, 16)
 
 [node name="HitboxComponent" type="Area2D" parent="."]
 collision_layer = 2
-collision_mask = 2
+collision_mask = 3
 script = ExtResource("3_4vtod")
 metadata/_custom_type_script = "uid://dn7al0ge7nn5y"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxComponent"]
 rotation = 0.748142
 shape = SubResource("CapsuleShape2D_8tt3v")
+
+[node name="PickupComponent" type="Node" parent="."]
+script = ExtResource("4_76v5j")
+item_name = "Wood"
+item_quantity = 1
+auto_pickup = false

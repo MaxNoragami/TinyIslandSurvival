@@ -1,6 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://c4itjloynmsyn"]
-
-[ext_resource type="Texture2D" uid="uid://bfc7bh6qqpijg" path="res://Assets/Icons/16x16.png" id="2_0cu6i"]
+[gd_scene load_steps=5 format=3 uid="uid://c4itjloynmsyn"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_km6kw"]
 bg_color = Color(0.721569, 0.537255, 0.329412, 1)
@@ -40,6 +38,16 @@ theme = SubResource("Theme_6h8ck")
 [node name="Sprite2D" type="Sprite2D" parent="CenterContainer/Panel"]
 position = Vector2(15, 15)
 scale = Vector2(1.875, 1.875)
-texture = ExtResource("2_0cu6i")
 region_enabled = true
 region_rect = Rect2(0, 0, 16, 16)
+
+[node name="Label" type="Label" parent="."]
+custom_minimum_size = Vector2(36, 17)
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 2
+vertical_alignment = 2
+autowrap_mode = 3

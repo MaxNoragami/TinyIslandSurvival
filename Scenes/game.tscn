@@ -8,7 +8,6 @@
 [node name="Game" type="Node"]
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
-visible = false
 
 [node name="InventoryUI" parent="CanvasLayer" instance=ExtResource("1_3dryh")]
 metadata/_edit_lock_ = true
@@ -22,3 +21,9 @@ position = Vector2(1417, 85)
 
 [node name="Wood" parent="." instance=ExtResource("3_wrm1d")]
 position = Vector2(1422, 137)
+
+[node name="Wood2" parent="." instance=ExtResource("3_wrm1d")]
+position = Vector2(1468, 114)
+
+[node name="Wood3" parent="." instance=ExtResource("3_wrm1d")]
+position = Vector2(1438, 112)
