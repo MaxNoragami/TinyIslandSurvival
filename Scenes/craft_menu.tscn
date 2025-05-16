@@ -37,7 +37,6 @@ corner_radius_bottom_left = 10
 corner_detail = 1
 
 [node name="CraftMenu" type="Control"]
-visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
