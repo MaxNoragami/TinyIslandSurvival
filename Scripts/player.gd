@@ -18,6 +18,11 @@ var inventory_component
 var facing_direction = "front"
 var last_animation = ""
 
+# Action state
+var is_performing_action = false
+var action_timer = 0.0
+var action_duration = 0.6  # Duration of action animations in seconds
+
 func _ready():
 	# Add self to Player group
 	add_to_group("Player")
@@ -54,14 +59,72 @@ func _ready():
 	# Set up collision mask to detect pickups (Layer 3)
 	collision_mask |= 4  # Add Layer 3 (pickup layer) to collision mask
 
-func _physics_process(_delta):
-	# Let the state machine handle most of the logic
-	if state_machine == null:
+func _physics_process(delta):
+	# Handle action timing
+	if is_performing_action:
+		action_timer += delta
+		if action_timer >= action_duration:
+			is_performing_action = false
+			action_timer = 0.0
+			# Return to previous animation state
+			if state_machine.current_state:
+				var state_name = state_machine.current_state.name.to_lower()
+				if state_name.begins_with("idle"):
+					play_animation("idle")
+				elif state_name.begins_with("move"):
+					play_animation("walk")
+	
+	# Let the state machine handle most of the logic if not performing an action
+	if state_machine != null and not is_performing_action:
+		# State machine handles movement
+		pass
+	elif state_machine == null and not is_performing_action:
 		# Fallback if no state machine is present
 		handle_movement()
 
+func _input(event):
+	# Handle item action (using equipped item)
+	if event.is_action_pressed("item_action") and not is_performing_action:
+		var equipped_item = get_equipped_item()
+		if equipped_item == "StoneAxe":
+			perform_action_with_item(equipped_item)
+
+# Get the currently equipped item from the equip slot
+func get_equipped_item():
+	var inventory_ui = get_tree().get_first_node_in_group("InventoryUI")
+	if inventory_ui and inventory_ui.equip_slot:
+		# Check if the equip slot is toggled (selected)
+		var button = inventory_ui.equip_slot.get_node_or_null("Button")
+		if not button or not button.button_pressed:
+			return ""  # Equip slot is not toggled on
+			
+		var sprite = inventory_ui.equip_slot.get_node_or_null("CenterContainer/Panel/Sprite2D")
+		if sprite and sprite.texture:
+			# Check if the currently equipped item is a Stone Axe
+			var region_rect = sprite.region_rect
+			# Match the StoneAxe region rect in the resource_data
+			if region_rect.position.x == 240 and region_rect.position.y == 1456:
+				return "StoneAxe"
+	return ""
+
+# Perform an action with the equipped item
+func perform_action_with_item(item_name):
+	if item_name == "StoneAxe":
+		# Play appropriate axe animation based on facing direction
+		is_performing_action = true
+		action_timer = 0.0
+		
+		var animation_name = "axe_" + facing_direction
+		if sprite:
+			sprite.play(animation_name)
+			print("Playing animation: ", animation_name)
+
 # Movement logic that can be called from states
 func handle_movement():
+	# Don't allow movement during actions
+	if is_performing_action:
+		return false
+		
 	var input_direction = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	
 	# Normalize to prevent faster diagonal movement
@@ -99,6 +162,10 @@ func update_facing_direction(direction):
 
 # Play animation based on state and direction
 func play_animation(state_name):
+	# Don't override action animations
+	if is_performing_action:
+		return
+		
 	if sprite:
 		var anim = state_name + "_" + facing_direction
 		if sprite.sprite_frames.has_animation(anim):
