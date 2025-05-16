@@ -31,5 +31,3 @@ shape = SubResource("CapsuleShape2D_8tt3v")
 [node name="PickupComponent" type="Node" parent="."]
 script = ExtResource("4_76v5j")
 item_name = "Wood"
-item_quantity = 1
-auto_pickup = false
