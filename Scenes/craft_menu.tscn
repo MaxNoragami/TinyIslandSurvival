@@ -1,5 +1,6 @@
-[gd_scene load_steps=7 format=3 uid="uid://byqjcujelepvd"]
+[gd_scene load_steps=8 format=3 uid="uid://byqjcujelepvd"]
 
+[ext_resource type="Script" uid="uid://eu5t1jgur0e2" path="res://Scripts/crafting_menu.gd" id="1_niquu"]
 [ext_resource type="PackedScene" uid="uid://c4itjloynmsyn" path="res://Scenes/inventory_slot.tscn" id="1_yb8js"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_niquu"]
@@ -43,6 +44,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_niquu")
 
 [node name="OutMargin" type="MarginContainer" parent="."]
 layout_mode = 1

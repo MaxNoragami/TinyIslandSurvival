@@ -28,6 +28,9 @@ var max_find_attempts = 5
 var currently_selected_slot = null
 
 func _ready():
+	# Add self to InventoryUI group for easy access
+	add_to_group("InventoryUI")
+	
 	# Make sure the inventory is initially hidden
 	if out_margin:
 		out_margin.visible = false
@@ -156,6 +159,11 @@ func toggle_inventory():
 		
 		# Update mouse filter based on visibility
 		if out_margin.visible:
+			# Close the crafting menu if it's open
+			var craft_menu = get_tree().get_first_node_in_group("CraftMenu")
+			if craft_menu and craft_menu.out_margin.visible:
+				craft_menu.toggle_crafting_menu()
+				
 			out_margin.mouse_filter = Control.MOUSE_FILTER_STOP
 		else:
 			out_margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
