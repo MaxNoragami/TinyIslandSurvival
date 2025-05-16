@@ -43,6 +43,11 @@ func _ready():
 				var button = child.get_node_or_null("Button")
 				if button:
 					button.toggled.connect(_on_inventory_slot_toggled.bind(child))
+				
+				# Connect the drop button signal
+				var drop_button = child.get_node_or_null("DropButton")
+				if drop_button:
+					drop_button.pressed.connect(_on_drop_button_pressed.bind(child))
 	
 	# Start looking for the player
 	find_player()
@@ -53,11 +58,16 @@ func _ready():
 # Handle inventory slot toggle
 func _on_inventory_slot_toggled(button_pressed, slot):
 	if button_pressed:
-		# If a slot was already selected, untoggle it
-		if currently_selected_slot and currently_selected_slot != slot:
-			var prev_button = currently_selected_slot.get_node_or_null("Button")
-			if prev_button:
-				prev_button.button_pressed = false
+		# Untoggle all other slots to ensure only one is selected
+		for other_slot in inventory_slots:
+			if other_slot != slot:
+				var other_button = other_slot.get_node_or_null("Button")
+				if other_button and other_button.button_pressed:
+					# Disconnect temporarily to avoid recursive toggling
+					other_button.toggled.disconnect(_on_inventory_slot_toggled.bind(other_slot))
+					other_button.button_pressed = false
+					# Reconnect the signal
+					other_button.toggled.connect(_on_inventory_slot_toggled.bind(other_slot))
 		
 		# Update the currently selected slot
 		currently_selected_slot = slot
@@ -147,12 +157,11 @@ func toggle_inventory():
 func _on_player_inventory_updated():
 	_update_inventory_display()
 	
-	# Reset selection when inventory changes
+	# Don't reset selection when inventory changes
+	# Just make sure the equip slot is updated if needed
 	if currently_selected_slot:
-		var button = currently_selected_slot.get_node_or_null("Button")
-		if button:
-			button.button_pressed = false
-		currently_selected_slot = null
+		update_equip_slot_from_selected()
+	else:
 		clear_equip_slot()
 
 # Update the UI to display player inventory
@@ -172,6 +181,7 @@ func _update_inventory_display():
 	for slot in inventory_slots:
 		var sprite = slot.get_node_or_null("CenterContainer/Panel/Sprite2D")
 		var label = slot.get_node_or_null("Label")
+		var drop_button = slot.get_node_or_null("DropButton")
 		
 		if sprite:
 			sprite.texture = null
@@ -179,6 +189,10 @@ func _update_inventory_display():
 		
 		if label:
 			label.text = ""
+			
+		# Hide drop button when slot is empty
+		if drop_button:
+			drop_button.visible = false
 	
 	# Fill slots with inventory items
 	for item_name in inventory:
@@ -188,6 +202,7 @@ func _update_inventory_display():
 			var slot = inventory_slots[slot_index]
 			var sprite = slot.get_node_or_null("CenterContainer/Panel/Sprite2D")
 			var label = slot.get_node_or_null("Label")
+			var drop_button = slot.get_node_or_null("DropButton")
 			
 			if sprite and resource_data.has(item_name):
 				sprite.texture = load(resource_data[item_name]["texture"])
@@ -197,4 +212,25 @@ func _update_inventory_display():
 			if label:
 				label.text = str(amount)
 			
+			# Show drop button when slot has an item
+			if drop_button:
+				drop_button.visible = true
+			
+			# Store item name in the slot for reference when dropping
+			slot.set_meta("item_name", item_name)
+			
 			slot_index += 1
+
+# Handle drop button press
+func _on_drop_button_pressed(slot):
+	if player_ref and slot.has_meta("item_name"):
+		var item_name = slot.get_meta("item_name")
+		
+		print("DEBUG: Dropping item: ", item_name)
+		
+		# Remove one of the item from inventory
+		if player_ref.has_method("remove_from_inventory"):
+			player_ref.remove_from_inventory(item_name, 1)
+			
+			# Update inventory display
+			_update_inventory_display()

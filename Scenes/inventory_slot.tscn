@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://c4itjloynmsyn"]
+[gd_scene load_steps=16 format=3 uid="uid://c4itjloynmsyn"]
 
 [ext_resource type="StyleBox" uid="uid://g66f6avsk86x" path="res://Styles/inventory_slot_normal.tres" id="1_0v82l"]
 
@@ -39,6 +39,39 @@ Button/styles/hover = SubResource("StyleBoxFlat_0v82l")
 Button/styles/normal = SubResource("StyleBoxEmpty_ewbek")
 Button/styles/pressed = ExtResource("1_0v82l")
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0v82l"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0cu6i"]
+bg_color = Color(0.654902, 0.105882, 0.0705882, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+corner_detail = 1
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pnayc"]
+bg_color = Color(0.654902, 0.105882, 0.0705882, 0.392157)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+corner_detail = 1
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6h8ck"]
+bg_color = Color(0.654902, 0.105882, 0.0705882, 0.654902)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+corner_detail = 1
+
+[sub_resource type="Theme" id="Theme_ewbek"]
+Button/colors/font_outline_color = Color(0, 0, 0, 1)
+Button/styles/focus = SubResource("StyleBoxEmpty_0v82l")
+Button/styles/hover = SubResource("StyleBoxFlat_0cu6i")
+Button/styles/normal = SubResource("StyleBoxFlat_pnayc")
+Button/styles/pressed = SubResource("StyleBoxFlat_6h8ck")
+
 [node name="InventorySlot" type="PanelContainer"]
 offset_right = 40.0
 offset_bottom = 40.0
@@ -77,3 +110,11 @@ focus_mode = 0
 mouse_default_cursor_shape = 2
 theme = SubResource("Theme_0cu6i")
 toggle_mode = true
+
+[node name="DropButton" type="Button" parent="."]
+visible = false
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme = SubResource("Theme_ewbek")

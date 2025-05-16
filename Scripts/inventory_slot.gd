@@ -40,8 +40,18 @@ func set_item_data(data: Dictionary) -> void:
 	if data.has("amount"):
 		label.text = data.amount
 	
+	# Show drop button if we have an item
+	var drop_button = get_node_or_null("DropButton")
+	if drop_button:
+		drop_button.visible = has_item()
+	
 # Clear the slot
 func clear() -> void:
 	sprite.texture = null
 	sprite.region_enabled = false
 	label.text = ""
+	
+	# Hide drop button when clearing
+	var drop_button = get_node_or_null("DropButton")
+	if drop_button:
+		drop_button.visible = false
