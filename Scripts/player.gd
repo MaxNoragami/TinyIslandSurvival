@@ -13,6 +13,7 @@ var hitbox_component
 var state_machine
 var sprite
 var inventory_component
+var action_hitbox
 
 # Last direction for animation purposes
 var facing_direction = "front"
@@ -22,6 +23,7 @@ var last_animation = ""
 var is_performing_action = false
 var action_timer = 0.0
 var action_duration = 0.6  # Duration of action animations in seconds
+var action_cooldown = 0.0  # Cooldown for repeating actions like chopping
 
 func _ready():
 	# Add self to Player group
@@ -31,7 +33,21 @@ func _ready():
 	health_component = $HealthComponent if has_node("HealthComponent") else null
 	hitbox_component = $HitboxComponent if has_node("HitboxComponent") else null
 	sprite = $AnimatedSprite2D if has_node("AnimatedSprite2D") else null
+	action_hitbox = $ActionHitbox if has_node("ActionHitbox") else null
 	
+	# Initialize action hitbox if it exists
+	if action_hitbox:
+		action_hitbox.monitoring = false  # Disable until needed
+		
+		# Make sure it has a CollisionShape2D
+		var shape = action_hitbox.get_node_or_null("CollisionShape2D")
+		if shape:
+			shape.disabled = true
+			
+		# Connect to area detection signal
+		if action_hitbox.has_signal("area_entered"):
+			action_hitbox.area_entered.connect(_on_action_hitbox_area_entered)
+
 	# Create or get inventory component
 	inventory_component = $InventoryComponent if has_node("InventoryComponent") else null
 	if !inventory_component:
@@ -60,14 +76,24 @@ func _ready():
 	collision_mask |= 4  # Add Layer 3 (pickup layer) to collision mask
 
 func _physics_process(delta):
+	# Handle cooldown timer
+	if action_cooldown > 0:
+		action_cooldown -= delta
+	
 	# Handle action timing
 	if is_performing_action:
 		action_timer += delta
 		if action_timer >= action_duration:
 			is_performing_action = false
 			action_timer = 0.0
+			# Disable the action hitbox when action is completed
+			if action_hitbox:
+				action_hitbox.monitoring = false
+				var shape = action_hitbox.get_node_or_null("CollisionShape2D")
+				if shape:
+					shape.disabled = true
 			# Return to previous animation state
-			if state_machine.current_state:
+			if state_machine and state_machine.current_state:
 				var state_name = state_machine.current_state.name.to_lower()
 				if state_name.begins_with("idle"):
 					play_animation("idle")
@@ -84,7 +110,7 @@ func _physics_process(delta):
 
 func _input(event):
 	# Handle item action (using equipped item)
-	if event.is_action_pressed("item_action") and not is_performing_action:
+	if event.is_action_pressed("item_action") and not is_performing_action and action_cooldown <= 0:
 		var equipped_item = get_equipped_item()
 		if equipped_item == "StoneAxe":
 			perform_action_with_item(equipped_item)
@@ -113,11 +139,52 @@ func perform_action_with_item(item_name):
 		# Play appropriate axe animation based on facing direction
 		is_performing_action = true
 		action_timer = 0.0
+		action_cooldown = 0.2  # Add a slight cooldown to prevent spamming
+		
+		# Position and enable the action hitbox
+		position_action_hitbox()
 		
 		var animation_name = "axe_" + facing_direction
 		if sprite:
 			sprite.play(animation_name)
 			print("Playing animation: ", animation_name)
+
+# Position the action hitbox in front of the player based on facing direction
+func position_action_hitbox():
+	if not action_hitbox:
+		return
+		
+	var hitbox_offset = Vector2.ZERO
+	
+	# Position the hitbox based on facing direction
+	if facing_direction == "front":
+		hitbox_offset = Vector2(0, 16)  # Down
+	elif facing_direction == "back":
+		hitbox_offset = Vector2(0, -16)  # Up
+	elif facing_direction == "right":
+		if sprite and sprite.flip_h:
+			hitbox_offset = Vector2(-16, 0)  # Left
+		else:
+			hitbox_offset = Vector2(16, 0)  # Right
+	
+	action_hitbox.position = hitbox_offset
+	action_hitbox.monitoring = true  # Enable the hitbox
+	
+	# Enable the collision shape
+	var shape = action_hitbox.get_node_or_null("CollisionShape2D")
+	if shape:
+		shape.disabled = false
+
+# Handle action hitbox collisions
+func _on_action_hitbox_area_entered(area):
+	var parent = area.get_parent()
+	
+	# Check if we're hitting a tree or other choppable object
+	if parent and parent.has_method("take_damage"):
+		# Check if parent is a tree (using group membership or specific check)
+		if parent.is_in_group("Trees") or parent.name.begins_with("Tree"):
+			parent.take_damage(1, self)
+			print("Chopped tree!")
 
 # Movement logic that can be called from states
 func handle_movement():

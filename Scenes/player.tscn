@@ -1,4 +1,4 @@
-[gd_scene load_steps=87 format=3 uid="uid://cpboxjdnfs5u2"]
+[gd_scene load_steps=88 format=3 uid="uid://cpboxjdnfs5u2"]
 
 [ext_resource type="Script" uid="uid://r22wf5tfkggs" path="res://Scripts/player.gd" id="1_v0iea"]
 [ext_resource type="Texture2D" uid="uid://btuvbecudn006" path="res://Assets/Player/Player_Actions.png" id="2_6t5aa"]
@@ -8,6 +8,9 @@
 [ext_resource type="Script" uid="uid://biku467aprx0b" path="res://Scripts/move_state.gd" id="6_8erm5"]
 [ext_resource type="Script" uid="uid://dry5ni6xjdkby" path="res://Scripts/health_component.gd" id="7_8erm5"]
 [ext_resource type="Script" uid="uid://dn7al0ge7nn5y" path="res://Scripts/hitbox_component.gd" id="8_f1ek2"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_action"]
+size = Vector2(16, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6t5aa"]
 size = Vector2(13, 9)
@@ -661,6 +664,14 @@ animations = [{
 collision_mask = 5
 script = ExtResource("1_v0iea")
 
+[node name="ActionHitbox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ActionHitbox"]
+shape = SubResource("RectangleShape2D_action")
+disabled = true
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(-0.5, 4.5)
 shape = SubResource("RectangleShape2D_6t5aa")
@@ -678,7 +689,7 @@ shape = SubResource("RectangleShape2D_6t5aa")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 z_index = 1
 sprite_frames = SubResource("SpriteFrames_l6n3p")
-animation = &"idle_front"
+animation = &"axe_back"
 autoplay = "idle_front"
 
 [node name="Camera2D" type="Camera2D" parent="."]
