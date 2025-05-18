@@ -88,7 +88,7 @@ func _physics_process(delta):
 	if not player_alive:
 		return 
 	enemy_attack()
-	attack()
+	# Removed attack() call here
 	if health <= 0:
 		die()
 		
@@ -135,7 +135,7 @@ func _input(event):
 
 	if event.is_action_pressed("item_action") and not is_performing_action and action_cooldown <= 0:
 		var equipped_item = get_equipped_item()
-		if equipped_item == "StoneAxe":
+		if equipped_item == "StoneAxe" or equipped_item == "StoneSword":
 			perform_action_with_item(equipped_item)
 
 # Get the currently equipped item from the equip slot
@@ -149,11 +149,17 @@ func get_equipped_item():
 			
 		var sprite = inventory_ui.equip_slot.get_node_or_null("CenterContainer/Panel/Sprite2D")
 		if sprite and sprite.texture:
-			# Check if the currently equipped item is a Stone Axe
+			# Check which item is equipped based on region_rect
 			var region_rect = sprite.region_rect
-			# Match the StoneAxe region rect in the resource_data
+			
+			# Match the StoneAxe region rect
 			if region_rect.position.x == 240 and region_rect.position.y == 1456:
 				return "StoneAxe"
+			
+			# Match the StoneSword region rect
+			if region_rect.position.x == 176 and region_rect.position.y == 1760:
+				return "StoneSword"
+				
 	return ""
 
 # Perform an action with the equipped item
@@ -165,16 +171,98 @@ func perform_action_with_item(item_name):
 			return  # Already playing the animation; skip
 
 		is_performing_action = true
+		Global.player_current_attack = true  # Set attack flag for damage detection
 		action_timer = 0.0
 		action_cooldown = 0.2  # Add a slight cooldown to prevent spamming
 
-		# Position and enable the action hitbox
-		position_action_hitbox()
-		
 		# Play animation once
 		if sprite:
 			sprite.play(animation_name)
 			print("Playing animation: ", animation_name)
+			
+		# Position and enable the action hitbox
+		position_action_hitbox()
+		
+		# Directly do a raycast to find what we're hitting
+		do_direct_action_check(item_name)
+		
+	elif item_name == "StoneSword":
+		# Use slash animations for sword
+		var animation_name = "slash_" + facing_direction
+		if sprite and sprite.is_playing() and sprite.animation == animation_name:
+			return  # Already playing the animation; skip
+			
+		is_performing_action = true
+		Global.player_current_attack = true  # Set attack flag for damage detection
+		action_timer = 0.0
+		action_cooldown = 0.3  # Slightly longer cooldown for sword
+		
+		# Play animation once
+		if sprite:
+			sprite.play(animation_name)
+			print("Playing sword animation: ", animation_name)
+			
+		# Position and enable the action hitbox
+		position_action_hitbox()
+		
+		# If using left direction, adjust hitbox position
+		if facing_direction == "right" and sprite.flip_h:
+			# We're facing left, so make sure the hitbox is positioned correctly
+			position_action_hitbox()
+
+# Do a direct raycast check to find what we're hitting
+func do_direct_action_check(item_name):
+	var hit_distance = 24.0  # Distance to check in front of player
+	var hit_position = global_position
+	
+	# Determine direction vector based on facing direction
+	var direction_vector = Vector2.ZERO
+	if facing_direction == "front":
+		direction_vector = Vector2(0, 1)
+	elif facing_direction == "back":
+		direction_vector = Vector2(0, -1)
+	elif facing_direction == "right":
+		direction_vector = Vector2(1 if not sprite.flip_h else -1, 0)
+	
+	# Calculate hit position
+	hit_position += direction_vector * hit_distance
+	
+	# Debug visualization
+	print("Checking direct hit at: ", hit_position)
+	
+	# Check what we're hitting with a larger radius to catch nearby objects
+	var space_state = get_world_2d().direct_space_state
+	var query = PhysicsShapeQueryParameters2D.new()
+	var circle_shape = CircleShape2D.new()
+	circle_shape.radius = 12.0  # Generous radius to catch objects
+	
+	query.set_shape(circle_shape)
+	query.transform = Transform2D(0, hit_position)
+	query.collision_mask = 2  # Layer 2 (hitboxes)
+	
+	var results = space_state.intersect_shape(query)
+	print("Found ", results.size(), " potential targets")
+	
+	# Process hits
+	for result in results:
+		var collider = result["collider"]
+		if collider is Area2D:
+			var parent = collider.get_parent()
+			
+			# Skip self-collisions
+			if parent == self:
+				continue
+				
+			print("Direct hit detected on: ", parent.name)
+			
+			# Apply damage based on item
+			if parent and parent.has_method("take_damage"):
+				if item_name == "StoneAxe" and (parent.is_in_group("Trees") or parent.name.begins_with("Tree")):
+					parent.take_damage(1, self)
+					print("Direct tree damage applied!")
+				elif item_name == "StoneSword" and parent.has_method("skeleton"):
+					parent.take_damage(35, self)
+					print("Direct skeleton damage applied!")
 
 # Position the action hitbox in front of the player based on facing direction
 func position_action_hitbox():
@@ -194,24 +282,35 @@ func position_action_hitbox():
 		else:
 			hitbox_offset = Vector2(16, 0)  # Right
 	
+	# Set position first
 	action_hitbox.position = hitbox_offset
-	action_hitbox.monitoring = true  # Enable the hitbox
 	
 	# Enable the collision shape
 	var shape = action_hitbox.get_node_or_null("CollisionShape2D")
 	if shape:
 		shape.disabled = false
+		
+	# Enable the hitbox monitoring last
+	action_hitbox.monitoring = true
 
 # Handle action hitbox collisions
 func _on_action_hitbox_area_entered(area):
 	var parent = area.get_parent()
+	print("Action hitbox area entered: ", parent.name if parent else "null")
+	
+	# Skip self-collisions
+	if parent == self:
+		return
 	
 	# Check if we're hitting a tree or other choppable object
 	if parent and parent.has_method("take_damage"):
-		# Check if parent is a tree (using group membership or specific check)
-		if parent.is_in_group("Trees") or parent.name.begins_with("Tree"):
+		var equipped_item = get_equipped_item()
+		if equipped_item == "StoneAxe" and (parent.is_in_group("Trees") or parent.name.begins_with("Tree")):
 			parent.take_damage(1, self)
 			print("Chopped tree!")
+		elif equipped_item == "StoneSword" and parent.has_method("skeleton"):
+			parent.take_damage(35, self)  # Sword does more damage
+			print("Attacked enemy with sword!")
 
 # Movement logic that can be called from states
 func handle_movement():
@@ -310,9 +409,25 @@ func _on_animation_finished(anim_name):
 		set_physics_process(false)
 		return
 
-	if anim_name.begins_with("axe_"):
-		print("Axe animation finished")
+	if anim_name.begins_with("axe_") or anim_name.begins_with("slash_") or anim_name.begins_with("pickaxe_"):
+		print("Action animation finished")
 		is_performing_action = false  # Allow new actions
+		Global.player_current_attack = false  # Reset attack flag
+		attack_ip = false
+
+		# Disable the action hitbox
+		if action_hitbox:
+			action_hitbox.monitoring = false
+			var shape = action_hitbox.get_node_or_null("CollisionShape2D")
+			if shape:
+				shape.disabled = true
+
+		# Force reset hitbox after animation finishes to prepare for next action
+		if action_hitbox:
+			action_hitbox.monitoring = false
+			var shape = action_hitbox.get_node_or_null("CollisionShape2D")
+			if shape:
+				shape.disabled = true
 
 		# Restore idle or walk animation based on state
 		if state_machine and state_machine.current_state:
@@ -384,9 +499,12 @@ func _on_attack_cooldown_timeout() -> void:
 	enemy_attack_cooldown = true
 	
 func attack():
-	if not has_item("StoneAxe", 1):  # Check inventory
-		return  # Cannot attack without an axe
-
+	# If we're using a weapon with item_action, don't duplicate the attack
+	var equipped_item = get_equipped_item()
+	if equipped_item == "StoneSword" or equipped_item == "StoneAxe":
+		return  # Skip attacking if proper tool is equipped (now handled by item_action)
+		
+	# No special weapon equipped at this point, so use default attack
 	var dir = facing_direction
 
 	if Input.is_action_just_pressed("attack") and not is_performing_action:
@@ -395,25 +513,18 @@ func attack():
 		is_performing_action = true  # Block spam
 		action_timer = 0.0  # Reset action timer
 
-		if dir== "right":
+		if dir == "right":
 			$AnimatedSprite2D.flip_h = false
 			$AnimatedSprite2D.play("pickaxe_right")
 			$deal_attack_timer.start()
-		if dir== "front":
+		elif dir == "front":
 			$AnimatedSprite2D.play("pickaxe_front")
 			$deal_attack_timer.start()
-		if dir == "back":
+		elif dir == "back":
 			$AnimatedSprite2D.play("pickaxe_back")
 			$deal_attack_timer.start()
 		else:
 			$AnimatedSprite2D.flip_h = true
-			$AnimatedSprite2D.play("pickaxe_left")
+			$AnimatedSprite2D.play("pickaxe_right")
 			$deal_attack_timer.start()
 		$deal_attack_timer.start()
-
-
-
-func _on_deal_attack_timer_timeout() -> void:
-	$deal_attack_timer.stop()
-	Global.player_current_attack = false
-	attack_ip = false

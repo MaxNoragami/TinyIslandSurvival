@@ -20,6 +20,7 @@ const resource_data = {
 	"Wood": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(144, 192, 16, 16)},
 	"Rock": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(160, 304, 16, 16)},
 	"StoneAxe": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(240, 1456, 16, 16)},
+	"StoneSword": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(176, 1760, 16, 16)},
 	# Add more resources here as needed
 }
 
