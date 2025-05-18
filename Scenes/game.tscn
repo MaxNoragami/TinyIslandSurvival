@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://erd5qpm8sraw"]
+[gd_scene load_steps=12 format=3 uid="uid://erd5qpm8sraw"]
 
 [ext_resource type="PackedScene" uid="uid://biuw3yy44r8vd" path="res://Scenes/inventory_ui.tscn" id="1_3dryh"]
 [ext_resource type="PackedScene" uid="uid://x4w6s15w1q3" path="res://Scenes/world.tscn" id="1_ebmjs"]
@@ -6,10 +6,11 @@
 [ext_resource type="PackedScene" uid="uid://cpboxjdnfs5u2" path="res://Scenes/player.tscn" id="2_qxrlw"]
 [ext_resource type="PackedScene" uid="uid://mpfurnu554th" path="res://Scenes/wood.tscn" id="3_wrm1d"]
 [ext_resource type="PackedScene" uid="uid://ci5syb8ys8yes" path="res://Scenes/tree.tscn" id="5_wowpa"]
-[ext_resource type="Script" uid="uid://cxf765vmr58vu" path="res://Scripts/tree_spawner.gd" id="6_8128m"]
+[ext_resource type="Script" path="res://Scripts/tree_spawner.gd" id="6_8128m"]
 [ext_resource type="PackedScene" uid="uid://dipv4rh4v4p32" path="res://Scenes/rock.tscn" id="6_h4fw4"]
-[ext_resource type="Script" uid="uid://bkvpboislfeik" path="res://Scripts/ore_spawner.gd" id="7_1l0tm"]
+[ext_resource type="Script" path="res://Scripts/ore_spawner.gd" id="7_1l0tm"]
 [ext_resource type="PackedScene" uid="uid://4qgoaa3ivu3f" path="res://Scenes/stone_axe.tscn" id="7_ldgsr"]
+[ext_resource type="PackedScene" uid="uid://qilno75ul2ds" path="res://Scenes/skeleton.tscn" id="11_o5yvi"]
 
 [node name="Game" type="Node"]
 
@@ -26,6 +27,7 @@ metadata/_edit_lock_ = true
 
 [node name="Player" parent="." instance=ExtResource("2_qxrlw")]
 position = Vector2(1417, 85)
+collision_layer = 3
 
 [node name="PickableItems" type="Node" parent="."]
 
@@ -67,3 +69,6 @@ max_spawn_percentage = 0.9
 [node name="Ores" type="Node" parent="."]
 script = ExtResource("7_1l0tm")
 num_ores = 300
+
+[node name="Skeleton" parent="." instance=ExtResource("11_o5yvi")]
+position = Vector2(1376, 95)
