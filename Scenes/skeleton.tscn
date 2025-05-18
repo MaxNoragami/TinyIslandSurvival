@@ -1,7 +1,8 @@
-[gd_scene load_steps=34 format=3 uid="uid://qilno75ul2ds"]
+[gd_scene load_steps=36 format=3 uid="uid://qilno75ul2ds"]
 
 [ext_resource type="Script" uid="uid://d2764vl5p8s6c" path="res://Scripts/skeleton.gd" id="1_81u3t"]
 [ext_resource type="Texture2D" uid="uid://cmd4eyj0kh4md" path="res://Assets/Enemies/Skeleton.png" id="2_r6xse"]
+[ext_resource type="Script" uid="uid://dn7al0ge7nn5y" path="res://Scripts/hitbox_component.gd" id="3_vd5x3"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_81u3t"]
 atlas = ExtResource("2_r6xse")
@@ -233,7 +234,11 @@ radius = 54.5894
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_iyyii"]
 size = Vector2(9, 13)
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_vd5x3"]
+radius = 16.0
+
 [node name="Skeleton" type="CharacterBody2D"]
+collision_layer = 3
 script = ExtResource("1_81u3t")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
@@ -254,5 +259,17 @@ shape = SubResource("CircleShape2D_yvw1e")
 position = Vector2(0, -6)
 shape = SubResource("RectangleShape2D_iyyii")
 
+[node name="HitboxComponent" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 2
+script = ExtResource("3_vd5x3")
+metadata/_custom_type_script = "uid://dn7al0ge7nn5y"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxComponent"]
+position = Vector2(1, -9)
+shape = SubResource("CircleShape2D_vd5x3")
+
 [connection signal="body_entered" from="AnimatedSprite2D/detection_area" to="." method="_on_detection_area_body_entered"]
 [connection signal="body_exited" from="AnimatedSprite2D/detection_area" to="." method="_on_detection_area_body_exited"]
+[connection signal="body_entered" from="HitboxComponent" to="." method="_on_hitbox_component_body_entered"]
+[connection signal="body_exited" from="HitboxComponent" to="." method="_on_hitbox_component_body_exited"]

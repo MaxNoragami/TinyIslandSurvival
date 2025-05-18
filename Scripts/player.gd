@@ -6,6 +6,11 @@ signal inventory_updated
 
 # Preload the InventoryComponent script
 const InventoryComponentScript = preload("res://Scripts/inventory_component.gd")
+var enemy_inattack_range = false
+var enemy_attack_cooldown = true
+var health = 100
+var player_alive = true
+var attack_ip = false
 
 # Component references
 var health_component
@@ -74,8 +79,15 @@ func _ready():
 	
 	# Set up collision mask to detect pickups (Layer 3)
 	collision_mask |= 4  # Add Layer 3 (pickup layer) to collision mask
-
+	if sprite and not sprite.is_connected("animation_finished", Callable(self, "_on_animation_finished")):
+		sprite.connect("animation_finished", Callable(self, "_on_animation_finished"))
+		
 func _physics_process(delta):
+	if not player_alive:
+		return 
+	enemy_attack()
+	if health <= 0:
+		die()
 	# Handle cooldown timer
 	if action_cooldown > 0:
 		action_cooldown -= delta
@@ -109,7 +121,9 @@ func _physics_process(delta):
 		handle_movement()
 
 func _input(event):
-	# Handle item action (using equipped item)
+	if not player_alive:
+		return  # Ignore input when dead
+
 	if event.is_action_pressed("item_action") and not is_performing_action and action_cooldown <= 0:
 		var equipped_item = get_equipped_item()
 		if equipped_item == "StoneAxe":
@@ -188,24 +202,24 @@ func _on_action_hitbox_area_entered(area):
 
 # Movement logic that can be called from states
 func handle_movement():
-	# Don't allow movement during actions
-	if is_performing_action:
-		return false
-		
+	if is_performing_action or not player_alive:
+		return false  # Don't allow movement if player is dead or busy
+
 	var input_direction = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	
-	# Normalize to prevent faster diagonal movement
 	if input_direction.length() > 0:
 		input_direction = input_direction.normalized()
 		update_facing_direction(input_direction)
 	
 	velocity = input_direction * move_speed
 	move_and_slide()
-	
+
 	return input_direction.length() > 0
 	
 # Update the facing direction based on movement
 func update_facing_direction(direction):
+	if not player_alive:
+		return 
 	var old_direction = facing_direction
 	
 	if abs(direction.x) > abs(direction.y):
@@ -229,10 +243,9 @@ func update_facing_direction(direction):
 
 # Play animation based on state and direction
 func play_animation(state_name):
-	# Don't override action animations
-	if is_performing_action:
-		return
-		
+	if is_performing_action or not player_alive:
+		return  # Don't override if dead or doing something else
+
 	if sprite:
 		var anim = state_name + "_" + facing_direction
 		if sprite.sprite_frames.has_animation(anim):
@@ -244,11 +257,11 @@ func play_animation(state_name):
 			print("Animation not found: ", anim)
 
 # Handle taking damage
-func take_damage(amount):
-	if health_component:
-		health_component.take_damage(amount)
-		if not health_component.is_alive():
-			die()
+#func take_damage(amount):
+	#if health_component:
+		#health_component.take_damage(amount)
+		#if not health_component.is_alive():
+			#die()
 	
 # Handle healing
 func heal(amount):
@@ -257,10 +270,32 @@ func heal(amount):
 		
 # Handle death
 func die():
+	
+	if not player_alive:
+		return  # Prevent calling die twice
+
+	player_alive = false
+	health = 0
+	print("Player has died")
+
+	# Stop movement
+	velocity = Vector2.ZERO
+
+	# Play death animation if available
 	if sprite and sprite.sprite_frames.has_animation("death"):
 		sprite.play("death")
-	# Could add more death handling logic here
-	
+	else:
+		# If no animation, just stop processing immediately
+		set_physics_process(false)
+	if state_machine:
+		state_machine.set_process(false)  # Stop state updates
+
+
+func _on_animation_finished(anim_name):
+	if anim_name == "death":
+		print("Death animation finished. Stopping physics.")
+		set_physics_process(false)
+
 # Apply knockback when hit
 func apply_knockback(direction):
 	velocity = direction
@@ -292,3 +327,29 @@ func get_inventory():
 # Forward the inventory updated signal
 func _on_inventory_updated():
 	emit_signal("inventory_updated")
+
+
+func _on_hitbox_component_body_entered(body):
+	print("Body entered hitbox: ", body.name)
+	if body.has_method("skeleton"):
+		enemy_inattack_range = true
+
+
+func _on_hitbox_component_body_exited(body):
+	print("Body exited hitbox: ", body.name)
+	if body.has_method("skeleton"):
+		enemy_inattack_range = false
+		
+func player():
+	pass
+	
+func enemy_attack():
+	if enemy_inattack_range and enemy_attack_cooldown == true and health > 0:
+		health = health - 20
+		enemy_attack_cooldown = false
+		$attack_cooldown.start()
+		print("Health - ", health)
+	
+
+func _on_attack_cooldown_timeout() -> void:
+	enemy_attack_cooldown = true
