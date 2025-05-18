@@ -154,7 +154,7 @@ animations = [{
 "duration": 20.2,
 "texture": SubResource("AtlasTexture_rwpf0")
 }],
-"loop": true,
+"loop": false,
 "name": &"death",
 "speed": 5.0
 }, {
@@ -243,7 +243,7 @@ script = ExtResource("1_81u3t")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_qv3qp")
-animation = &"death"
+animation = &"walk"
 autoplay = "idle"
 offset = Vector2(0, -7)
 

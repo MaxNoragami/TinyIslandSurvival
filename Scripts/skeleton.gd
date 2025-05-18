@@ -8,6 +8,7 @@ var player_inattack_zone = false
 var can_take_damage = true
 var skeleton_alive = true
 var death_animation_played = false
+var knockback_velocity = Vector2.ZERO
 
 
 func _ready():
@@ -24,7 +25,16 @@ func _physics_process(delta):
 	if not skeleton_alive:
 		return
 	
+	# Apply knockback if any
+	if knockback_velocity.length() > 0.1:
+		position += knockback_velocity * delta
+		# Gradually reduce knockback (damping)
+		knockback_velocity = knockback_velocity.move_toward(Vector2.ZERO, 500 * delta)
+	else:
+		knockback_velocity = Vector2.ZERO  # Stop completely if very small
+
 	deal_with_damage()
+
 	if not $AnimatedSprite2D.is_playing() or $AnimatedSprite2D.animation != "death":
 		if player_chase and player and skeleton_alive:
 			position += (player.position - position) / speed
@@ -83,6 +93,8 @@ func deal_with_damage():
 	if player_inattack_zone and Global.player_current_attack == true:
 		if can_take_damage == true:
 			health = health - 20
+			var direction = (position - player.position).normalized()
+			knockback_velocity = direction * 150  # Adjust strength as needed
 			$take_damage_cooldown.start()
 			can_take_damage = false
 			print("Skeleton health - ", health)

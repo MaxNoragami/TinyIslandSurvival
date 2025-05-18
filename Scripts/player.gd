@@ -11,6 +11,7 @@ var enemy_attack_cooldown = true
 var health = 200
 var player_alive = true
 var attack_ip = false
+var knockback_velocity = Vector2.ZERO
 
 
 # Component references
@@ -90,6 +91,12 @@ func _physics_process(delta):
 	attack()
 	if health <= 0:
 		die()
+		
+	if knockback_velocity.length() > 0.1:
+		position += knockback_velocity * delta
+		knockback_velocity = knockback_velocity.move_toward(Vector2.ZERO, 600 * delta)  # Adjust damping
+	else:
+		knockback_velocity = Vector2.ZERO
 	# Handle cooldown timer
 	if action_cooldown > 0:
 		action_cooldown -= delta
@@ -152,15 +159,19 @@ func get_equipped_item():
 # Perform an action with the equipped item
 func perform_action_with_item(item_name):
 	if item_name == "StoneAxe":
-		# Play appropriate axe animation based on facing direction
+		# Prevent interrupting a currently playing action animation
+		var animation_name = "axe_" + facing_direction
+		if sprite and sprite.is_playing() and sprite.animation == animation_name:
+			return  # Already playing the animation; skip
+
 		is_performing_action = true
 		action_timer = 0.0
 		action_cooldown = 0.2  # Add a slight cooldown to prevent spamming
-		
+
 		# Position and enable the action hitbox
 		position_action_hitbox()
 		
-		var animation_name = "axe_" + facing_direction
+		# Play animation once
 		if sprite:
 			sprite.play(animation_name)
 			print("Playing animation: ", animation_name)
@@ -297,6 +308,19 @@ func _on_animation_finished(anim_name):
 	if anim_name == "death":
 		print("Death animation finished. Stopping physics.")
 		set_physics_process(false)
+		return
+
+	if anim_name.begins_with("axe_"):
+		print("Axe animation finished")
+		is_performing_action = false  # Allow new actions
+
+		# Restore idle or walk animation based on state
+		if state_machine and state_machine.current_state:
+			var state_name = state_machine.current_state.name.to_lower()
+			if state_name.begins_with("idle"):
+				play_animation("idle")
+			elif state_name.begins_with("move"):
+				play_animation("walk")
 
 # Apply knockback when hit
 func apply_knockback(direction):
@@ -335,6 +359,8 @@ func _on_hitbox_component_body_entered(body):
 	print("Body entered hitbox: ", body.name)
 	if body.has_method("skeleton"):
 		enemy_inattack_range = true
+		var direction = (position - body.position).normalized()
+		knockback_velocity = direction * 100  
 
 
 func _on_hitbox_component_body_exited(body):
@@ -348,6 +374,7 @@ func player():
 func enemy_attack():
 	if enemy_inattack_range and enemy_attack_cooldown == true and health > 0:
 		health = health - 20
+		# Tune force as needed
 		enemy_attack_cooldown = false
 		$attack_cooldown.start()
 		print("Health - ", health)
@@ -355,13 +382,19 @@ func enemy_attack():
 
 func _on_attack_cooldown_timeout() -> void:
 	enemy_attack_cooldown = true
-
-func attack():
-	var dir = facing_direction
 	
-	if Input.is_action_just_pressed("attack"):
+func attack():
+	if not has_item("StoneAxe", 1):  # Check inventory
+		return  # Cannot attack without an axe
+
+	var dir = facing_direction
+
+	if Input.is_action_just_pressed("attack") and not is_performing_action:
 		Global.player_current_attack = true
 		attack_ip = true
+		is_performing_action = true  # Block spam
+		action_timer = 0.0  # Reset action timer
+
 		if dir== "right":
 			$AnimatedSprite2D.flip_h = false
 			$AnimatedSprite2D.play("pickaxe_right")
@@ -376,6 +409,8 @@ func attack():
 			$AnimatedSprite2D.flip_h = true
 			$AnimatedSprite2D.play("pickaxe_left")
 			$deal_attack_timer.start()
+		$deal_attack_timer.start()
+
 
 
 func _on_deal_attack_timer_timeout() -> void:
