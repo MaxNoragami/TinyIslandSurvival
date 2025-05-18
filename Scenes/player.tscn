@@ -693,7 +693,7 @@ shape = SubResource("CircleShape2D_8erm5")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 z_index = 1
 sprite_frames = SubResource("SpriteFrames_l6n3p")
-animation = &"idle_front"
+animation = &"pickaxe_front"
 autoplay = "idle_front"
 
 [node name="Camera2D" type="Camera2D" parent="."]
@@ -719,6 +719,10 @@ metadata/_custom_type_script = "uid://dry5ni6xjdkby"
 [node name="attack_cooldown" type="Timer" parent="."]
 wait_time = 0.5
 
+[node name="deal_attack_timer" type="Timer" parent="."]
+wait_time = 0.504
+
 [connection signal="body_entered" from="HitboxComponent" to="." method="_on_hitbox_component_body_entered"]
 [connection signal="body_exited" from="HitboxComponent" to="." method="_on_hitbox_component_body_exited"]
 [connection signal="timeout" from="attack_cooldown" to="." method="_on_attack_cooldown_timeout"]
+[connection signal="timeout" from="deal_attack_timer" to="." method="_on_deal_attack_timer_timeout"]

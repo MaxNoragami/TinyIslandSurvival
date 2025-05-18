@@ -8,9 +8,10 @@ signal inventory_updated
 const InventoryComponentScript = preload("res://Scripts/inventory_component.gd")
 var enemy_inattack_range = false
 var enemy_attack_cooldown = true
-var health = 100
+var health = 200
 var player_alive = true
 var attack_ip = false
+
 
 # Component references
 var health_component
@@ -86,6 +87,7 @@ func _physics_process(delta):
 	if not player_alive:
 		return 
 	enemy_attack()
+	attack()
 	if health <= 0:
 		die()
 	# Handle cooldown timer
@@ -236,7 +238,7 @@ func update_facing_direction(direction):
 	# If direction changed, update animation
 	if old_direction != facing_direction and state_machine and state_machine.current_state:
 		var state_name = state_machine.current_state.name.to_lower()
-		if state_name.begins_with("idle"):
+		if state_name.begins_with("idle") and attack_ip == false:
 			play_animation("idle")
 		elif state_name.begins_with("move"):
 			play_animation("walk")
@@ -273,7 +275,7 @@ func die():
 	
 	if not player_alive:
 		return  # Prevent calling die twice
-
+	Global.player_current_attack = false
 	player_alive = false
 	health = 0
 	print("Player has died")
@@ -353,3 +355,30 @@ func enemy_attack():
 
 func _on_attack_cooldown_timeout() -> void:
 	enemy_attack_cooldown = true
+
+func attack():
+	var dir = facing_direction
+	
+	if Input.is_action_just_pressed("attack"):
+		Global.player_current_attack = true
+		attack_ip = true
+		if dir== "right":
+			$AnimatedSprite2D.flip_h = false
+			$AnimatedSprite2D.play("pickaxe_right")
+			$deal_attack_timer.start()
+		if dir== "front":
+			$AnimatedSprite2D.play("pickaxe_front")
+			$deal_attack_timer.start()
+		if dir == "back":
+			$AnimatedSprite2D.play("pickaxe_back")
+			$deal_attack_timer.start()
+		else:
+			$AnimatedSprite2D.flip_h = true
+			$AnimatedSprite2D.play("pickaxe_left")
+			$deal_attack_timer.start()
+
+
+func _on_deal_attack_timer_timeout() -> void:
+	$deal_attack_timer.stop()
+	Global.player_current_attack = false
+	attack_ip = false
