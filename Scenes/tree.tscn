@@ -4,11 +4,11 @@
 [ext_resource type="Script" uid="uid://dn7al0ge7nn5y" path="res://Scripts/hitbox_component.gd" id="2_gvmkm"]
 [ext_resource type="Texture2D" uid="uid://d1nmuc8kutr6g" path="res://Assets/Outdoor decoration/Outdoor_Decor_Free.png" id="2_l3oha"]
 [ext_resource type="Script" uid="uid://dry5ni6xjdkby" path="res://Scripts/health_component.gd" id="3_gvmkm"]
-[ext_resource type="Script" uid="uid://didxwl1at6mqe" path="res://Scripts/Tree.gd" id="4_gvmkm"]
+[ext_resource type="Script" uid="uid://didxwl1at6mqe" path="res://Scripts/tree.gd" id="4_gvmkm"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_l7sa7"]
-radius = 7.0
-height = 16.0
+radius = 8.0
+height = 22.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_l3oha"]
 radius = 5.0

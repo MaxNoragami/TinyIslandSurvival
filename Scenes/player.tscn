@@ -1,4 +1,4 @@
-[gd_scene load_steps=88 format=3 uid="uid://cpboxjdnfs5u2"]
+[gd_scene load_steps=89 format=3 uid="uid://cpboxjdnfs5u2"]
 
 [ext_resource type="Script" uid="uid://r22wf5tfkggs" path="res://Scripts/player.gd" id="1_v0iea"]
 [ext_resource type="Texture2D" uid="uid://btuvbecudn006" path="res://Assets/Player/Player_Actions.png" id="2_6t5aa"]
@@ -14,6 +14,9 @@ size = Vector2(16, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6t5aa"]
 size = Vector2(13, 9)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8erm5"]
+size = Vector2(12, 16)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_l6n3p"]
 atlas = ExtResource("2_6t5aa")
@@ -480,7 +483,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_11gg7")
 }],
-"loop": true,
+"loop": false,
 "name": &"pickaxe_back",
 "speed": 5.0
 }, {
@@ -491,7 +494,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_sbwqj")
 }],
-"loop": true,
+"loop": false,
 "name": &"pickaxe_front",
 "speed": 5.0
 }, {
@@ -502,7 +505,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_sweqm")
 }],
-"loop": true,
+"loop": false,
 "name": &"pickaxe_right",
 "speed": 5.0
 }, {
@@ -661,6 +664,7 @@ animations = [{
 }]
 
 [node name="Player" type="CharacterBody2D"]
+collision_layer = 3
 collision_mask = 5
 script = ExtResource("1_v0iea")
 
@@ -683,13 +687,14 @@ script = ExtResource("8_f1ek2")
 metadata/_custom_type_script = "uid://dn7al0ge7nn5y"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxComponent"]
-position = Vector2(-0.5, -1)
-shape = SubResource("RectangleShape2D_6t5aa")
+position = Vector2(-1, 1)
+shape = SubResource("RectangleShape2D_8erm5")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 z_index = 1
+position = Vector2(-1, 0)
 sprite_frames = SubResource("SpriteFrames_l6n3p")
-animation = &"axe_back"
+animation = &"pickaxe_right"
 autoplay = "idle_front"
 
 [node name="Camera2D" type="Camera2D" parent="."]
@@ -711,3 +716,14 @@ metadata/_custom_type_script = "uid://biku467aprx0b"
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("7_8erm5")
 metadata/_custom_type_script = "uid://dry5ni6xjdkby"
+
+[node name="attack_cooldown" type="Timer" parent="."]
+wait_time = 0.5
+
+[node name="deal_attack_timer" type="Timer" parent="."]
+wait_time = 0.504
+
+[connection signal="body_entered" from="HitboxComponent" to="." method="_on_hitbox_component_body_entered"]
+[connection signal="body_exited" from="HitboxComponent" to="." method="_on_hitbox_component_body_exited"]
+[connection signal="timeout" from="attack_cooldown" to="." method="_on_attack_cooldown_timeout"]
+[connection signal="timeout" from="deal_attack_timer" to="." method="_on_deal_attack_timer_timeout"]

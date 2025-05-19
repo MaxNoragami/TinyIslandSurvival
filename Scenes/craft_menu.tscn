@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=3 uid="uid://byqjcujelepvd"]
 
-[ext_resource type="Script" uid="uid://eu5t1jgur0e2" path="res://Scripts/crafting_menu.gd" id="1_niquu"]
+[ext_resource type="Script" path="res://Scripts/crafting_menu.gd" id="1_niquu"]
 [ext_resource type="PackedScene" uid="uid://c4itjloynmsyn" path="res://Scenes/inventory_slot.tscn" id="1_yb8js"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_niquu"]
