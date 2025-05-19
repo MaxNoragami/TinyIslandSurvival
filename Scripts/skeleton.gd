@@ -85,13 +85,15 @@ func _on_hitbox_component_body_exited(body: Node2D) -> void:
 func deal_with_damage():
 	if player_inattack_zone and Global.player_current_attack == true:
 		if can_take_damage == true:
+			if health > 0:
+				_show_damage_effect()
 			health = health - 20
-			Global.player_current_attack = false  # <-- reset after applying hit
 			var direction = (position - player.position).normalized()
 			knockback_velocity = direction * 150  # Adjust strength as needed
 			$take_damage_cooldown.start()
 			can_take_damage = false
 			print("Skeleton health - ", health)
+			Global.player_current_attack = false  # <-- reset after applying hit
 			if health <= 0:
 				die()  # This will emit the signal
 
@@ -103,3 +105,8 @@ func _on_death_cleanup_timer_timeout():
 
 func _on_take_damage_cooldown_timeout() -> void:
 	can_take_damage = true
+
+func _show_damage_effect():
+	var tween = create_tween()
+	tween.tween_property(self, "modulate", Color(1, 0.5, 0.5), 0.1)
+	tween.tween_property(self, "modulate", Color(1, 1, 1), 0.1)

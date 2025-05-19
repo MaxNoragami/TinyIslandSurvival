@@ -79,6 +79,13 @@ func _ready():
 	else:
 		push_error("StateMachine not found on Player - make sure to add it as a child node")
 	
+	var attack_reset_timer = Timer.new()
+	attack_reset_timer.name = "AttackResetTimer"
+	attack_reset_timer.wait_time = action_duration + 0.1
+	attack_reset_timer.one_shot = true
+	add_child(attack_reset_timer)
+	attack_reset_timer.timeout.connect(_on_attack_reset_timeout)
+	
 	# Set up collision mask to detect pickups (Layer 3)
 	collision_mask |= 4  # Add Layer 3 (pickup layer) to collision mask
 	if sprite and not sprite.is_connected("animation_finished", Callable(self, "_on_animation_finished")):
@@ -164,6 +171,8 @@ func get_equipped_item():
 
 # Perform an action with the equipped item
 func perform_action_with_item(item_name):
+	if is_performing_action:
+		return
 	if item_name == "StoneAxe":
 		# Prevent interrupting a currently playing action animation
 		var animation_name = "axe_" + facing_direction
@@ -311,6 +320,7 @@ func _on_action_hitbox_area_entered(area):
 		elif equipped_item == "StoneSword" and parent.has_method("skeleton"):
 			parent.take_damage(35, self)  # Sword does more damage
 			print("Attacked enemy with sword!")
+			Global.player_current_attack = false
 
 # Movement logic that can be called from states
 func handle_movement():
@@ -480,6 +490,7 @@ func player():
 	
 func enemy_attack():
 	if enemy_inattack_range and enemy_attack_cooldown == true and health > 0:
+		_show_damage_effect()
 		health = health - 20
 		# Tune force as needed
 		enemy_attack_cooldown = false
@@ -488,6 +499,7 @@ func enemy_attack():
 	
 
 func _on_attack_cooldown_timeout() -> void:
+	Global.player_current_attack = false
 	enemy_attack_cooldown = true
 	
 func attack():
@@ -520,3 +532,24 @@ func attack():
 			$AnimatedSprite2D.play("pickaxe_right")
 			$deal_attack_timer.start()
 		$deal_attack_timer.start()
+
+func _show_damage_effect():
+	var tween = create_tween()
+	tween.tween_property(self, "modulate", Color(1, 0.5, 0.5), 0.1)
+	tween.tween_property(self, "modulate", Color(1, 1, 1), 0.1)
+
+# Add this at the bottom of your script
+func _on_attack_reset_timeout():
+	if Global.player_current_attack:
+		print("[Timer Fallback] Resetting lingering attack state")
+	Global.player_current_attack = false
+	is_performing_action = false
+	action_timer = 0.0
+	attack_ip = false
+
+	# Safely disable action hitbox in case it was left on
+	if action_hitbox:
+		action_hitbox.monitoring = false
+		var shape = action_hitbox.get_node_or_null("CollisionShape2D")
+		if shape:
+			shape.disabled = true
