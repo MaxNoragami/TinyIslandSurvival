@@ -2,7 +2,7 @@ extends Node
 class_name EnemySpawner
 
 @export var enemy_scene: PackedScene
-@export var num_enemies: int = 20
+@export var num_enemies: int = 25
 @export var min_distance_from_player: float = 100.0
 @export var min_distance_between_enemies: float = 50.0  # Minimum distance between monsters
 @export var position_randomization: float = 4.0
