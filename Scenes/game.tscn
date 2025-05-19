@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://erd5qpm8sraw"]
+[gd_scene load_steps=14 format=3 uid="uid://erd5qpm8sraw"]
 
 [ext_resource type="PackedScene" uid="uid://biuw3yy44r8vd" path="res://Scenes/inventory_ui.tscn" id="1_3dryh"]
 [ext_resource type="PackedScene" uid="uid://x4w6s15w1q3" path="res://Scenes/world.tscn" id="1_ebmjs"]
@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://4qgoaa3ivu3f" path="res://Scenes/stone_axe.tscn" id="7_ldgsr"]
 [ext_resource type="PackedScene" uid="uid://cpva6ufsf0e4a" path="res://Scenes/stone_sword.tscn" id="8_rku1e"]
 [ext_resource type="PackedScene" uid="uid://qilno75ul2ds" path="res://Scenes/skeleton.tscn" id="11_o5yvi"]
+[ext_resource type="Script" uid="uid://dkkqpoqevnu5j" path="res://Scenes/enemy_spawn.gd" id="13_rfjv2"]
 
 [node name="Game" type="Node"]
 
@@ -73,5 +74,6 @@ max_spawn_percentage = 0.9
 script = ExtResource("7_1l0tm")
 num_ores = 300
 
-[node name="Skeleton" parent="." instance=ExtResource("11_o5yvi")]
-position = Vector2(1285, 102)
+[node name="EnemySpawn" type="Node" parent="."]
+script = ExtResource("13_rfjv2")
+enemy_scene = ExtResource("11_o5yvi")

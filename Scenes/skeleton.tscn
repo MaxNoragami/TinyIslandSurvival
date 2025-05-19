@@ -235,7 +235,7 @@ radius = 54.5894
 size = Vector2(9, 13)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_vd5x3"]
-radius = 16.0
+radius = 15.0
 
 [node name="Skeleton" type="CharacterBody2D"]
 collision_layer = 3
@@ -265,7 +265,7 @@ script = ExtResource("3_vd5x3")
 metadata/_custom_type_script = "uid://dn7al0ge7nn5y"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxComponent"]
-position = Vector2(1, -9)
+position = Vector2(0, -9)
 shape = SubResource("CircleShape2D_vd5x3")
 
 [node name="death_cleanup_timer" type="Timer" parent="."]

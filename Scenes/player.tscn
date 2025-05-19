@@ -15,8 +15,8 @@ size = Vector2(16, 16)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6t5aa"]
 size = Vector2(13, 9)
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_8erm5"]
-radius = 15.5
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8erm5"]
+size = Vector2(12, 16)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_l6n3p"]
 atlas = ExtResource("2_6t5aa")
@@ -687,11 +687,12 @@ script = ExtResource("8_f1ek2")
 metadata/_custom_type_script = "uid://dn7al0ge7nn5y"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxComponent"]
-position = Vector2(-0.5, -1)
-shape = SubResource("CircleShape2D_8erm5")
+position = Vector2(-1, 1)
+shape = SubResource("RectangleShape2D_8erm5")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 z_index = 1
+position = Vector2(-1, 0)
 sprite_frames = SubResource("SpriteFrames_l6n3p")
 animation = &"pickaxe_right"
 autoplay = "idle_front"

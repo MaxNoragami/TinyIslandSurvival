@@ -82,7 +82,7 @@ func _ready():
 	# Set up collision mask to detect pickups (Layer 3)
 	collision_mask |= 4  # Add Layer 3 (pickup layer) to collision mask
 	if sprite and not sprite.is_connected("animation_finished", Callable(self, "_on_animation_finished")):
-		sprite.connect("animation_finished", Callable(self, "_on_animation_finished"))
+		sprite.animation_finished.connect(_on_animation_finished)
 		
 func _physics_process(delta):
 	if not player_alive:
