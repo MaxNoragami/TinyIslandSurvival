@@ -86,6 +86,7 @@ func deal_with_damage():
 	if player_inattack_zone and Global.player_current_attack == true:
 		if can_take_damage == true:
 			health = health - 20
+			Global.player_current_attack = false  # <-- reset after applying hit
 			var direction = (position - player.position).normalized()
 			knockback_velocity = direction * 150  # Adjust strength as needed
 			$take_damage_cooldown.start()

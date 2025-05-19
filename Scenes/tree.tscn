@@ -7,8 +7,8 @@
 [ext_resource type="Script" uid="uid://didxwl1at6mqe" path="res://Scripts/tree.gd" id="4_gvmkm"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_l7sa7"]
-radius = 7.0
-height = 16.0
+radius = 8.0
+height = 22.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_l3oha"]
 radius = 5.0

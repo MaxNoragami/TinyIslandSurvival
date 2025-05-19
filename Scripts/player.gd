@@ -82,8 +82,8 @@ func _ready():
 	# Set up collision mask to detect pickups (Layer 3)
 	collision_mask |= 4  # Add Layer 3 (pickup layer) to collision mask
 	if sprite and not sprite.is_connected("animation_finished", Callable(self, "_on_animation_finished")):
-		sprite.animation_finished.connect(_on_animation_finished)
-		
+		sprite.animation_finished.connect(Callable(self, "_on_animation_finished"))
+
 func _physics_process(delta):
 	if not player_alive:
 		return 
@@ -403,7 +403,8 @@ func die():
 		state_machine.set_process(false)  # Stop state updates
 
 
-func _on_animation_finished(anim_name):
+func _on_animation_finished():
+	var anim_name = sprite.animation  # Get current animation manually
 	if anim_name == "death":
 		print("Death animation finished. Stopping physics.")
 		set_physics_process(false)
@@ -411,25 +412,16 @@ func _on_animation_finished(anim_name):
 
 	if anim_name.begins_with("axe_") or anim_name.begins_with("slash_") or anim_name.begins_with("pickaxe_"):
 		print("Action animation finished")
-		is_performing_action = false  # Allow new actions
-		Global.player_current_attack = false  # Reset attack flag
+		is_performing_action = false
+		Global.player_current_attack = false
 		attack_ip = false
 
-		# Disable the action hitbox
 		if action_hitbox:
 			action_hitbox.monitoring = false
 			var shape = action_hitbox.get_node_or_null("CollisionShape2D")
 			if shape:
 				shape.disabled = true
 
-		# Force reset hitbox after animation finishes to prepare for next action
-		if action_hitbox:
-			action_hitbox.monitoring = false
-			var shape = action_hitbox.get_node_or_null("CollisionShape2D")
-			if shape:
-				shape.disabled = true
-
-		# Restore idle or walk animation based on state
 		if state_machine and state_machine.current_state:
 			var state_name = state_machine.current_state.name.to_lower()
 			if state_name.begins_with("idle"):
