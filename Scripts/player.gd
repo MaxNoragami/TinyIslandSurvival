@@ -1,7 +1,7 @@
 extends CharacterBody2D
 
 signal inventory_updated
-
+signal game_over
 @export var move_speed: float = 100.0
 
 # Preload the InventoryComponent script
@@ -411,7 +411,7 @@ func die():
 		set_physics_process(false)
 	if state_machine:
 		state_machine.set_process(false)  # Stop state updates
-
+	game_over.emit()
 
 func _on_animation_finished():
 	var anim_name = sprite.animation  # Get current animation manually

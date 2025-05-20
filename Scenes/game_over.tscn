@@ -1,0 +1,94 @@
+[gd_scene load_steps=9 format=3 uid="uid://y042dp8kdtbf"]
+
+[ext_resource type="FontFile" uid="uid://dylhu0n40j0n" path="res://Assets/Daydream.ttf" id="1_8fo1c"]
+[ext_resource type="Script" uid="uid://cplwaxi75hih1" path="res://Scenes/game_over.gd" id="1_m5628"]
+
+[sub_resource type="Theme" id="Theme_ek8ke"]
+default_font = ExtResource("1_8fo1c")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k52d1"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="RichTextEffect" id="RichTextEffect_eoghk"]
+
+[sub_resource type="Animation" id="Animation_14u15"]
+resource_name = "show"
+length = 2.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Panel:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1.7411),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 0.988235)]
+}
+
+[sub_resource type="Animation" id="Animation_j3ryr"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Panel:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_rjluv"]
+_data = {
+&"RESET": SubResource("Animation_j3ryr"),
+&"show": SubResource("Animation_14u15")
+}
+
+[node name="GameOver" type="Control" node_paths=PackedStringArray("visible_ui", "animation_player")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_ek8ke")
+script = ExtResource("1_m5628")
+visible_ui = NodePath("Panel")
+animation_player = NodePath("AnimationPlayer")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_k52d1")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -311.0
+offset_top = -80.0
+offset_right = 389.0
+offset_bottom = 28.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/normal_font = ExtResource("1_8fo1c")
+theme_override_font_sizes/normal_font_size = 66
+bbcode_enabled = true
+text = "[rainbow freq=1 sat=0.7 val=0.8][wave amp=50.0 freq=5.0 connected=1]GAME OVER"
+custom_effects = [SubResource("RichTextEffect_eoghk")]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_rjluv")
+}
