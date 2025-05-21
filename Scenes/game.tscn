@@ -1,9 +1,10 @@
-[gd_scene load_steps=14 format=3 uid="uid://erd5qpm8sraw"]
+[gd_scene load_steps=15 format=3 uid="uid://erd5qpm8sraw"]
 
 [ext_resource type="PackedScene" uid="uid://biuw3yy44r8vd" path="res://Scenes/inventory_ui.tscn" id="1_3dryh"]
 [ext_resource type="PackedScene" uid="uid://x4w6s15w1q3" path="res://Scenes/world.tscn" id="1_ebmjs"]
 [ext_resource type="PackedScene" uid="uid://byqjcujelepvd" path="res://Scenes/craft_menu.tscn" id="2_i6g32"]
 [ext_resource type="PackedScene" uid="uid://cpboxjdnfs5u2" path="res://Scenes/player.tscn" id="2_qxrlw"]
+[ext_resource type="PackedScene" uid="uid://brei3tff61c34" path="res://Scenes/game_over.tscn" id="3_1phco"]
 [ext_resource type="PackedScene" uid="uid://mpfurnu554th" path="res://Scenes/wood.tscn" id="3_wrm1d"]
 [ext_resource type="PackedScene" uid="uid://ci5syb8ys8yes" path="res://Scenes/tree.tscn" id="5_wowpa"]
 [ext_resource type="Script" uid="uid://cxf765vmr58vu" path="res://Scripts/tree_spawner.gd" id="6_8128m"]
@@ -22,6 +23,8 @@
 metadata/_edit_lock_ = true
 
 [node name="CraftMenu" parent="CanvasLayer" instance=ExtResource("2_i6g32")]
+
+[node name="GameOver" parent="CanvasLayer" instance=ExtResource("3_1phco")]
 
 [node name="World" parent="." instance=ExtResource("1_ebmjs")]
 position = Vector2(23, -12)
