@@ -13,6 +13,11 @@ var resource_data = {
 	"RuneStone": {"texture": "res://Assets/Outdoor decoration/ancient_tablet.png", "region": Rect2(0, 0, 16, 16), "scale": Vector2(0.025, 0.025), "use_region": false},
 	"MagicCompass": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(80, 1056, 16, 16)},
 	"Crystal": {"texture": "res://Assets/Outdoor decoration/crystal.png", "scale": Vector2(0.03, 0.03), "use_region": false}, # Added Crystal item
+	"StoneSword": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(176, 1760, 16, 16)},
+	"StonePickaxe": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(16, 1456, 16, 16)},
+	"Iron": {"texture": "res://Assets/Outdoor decoration/Outdoor_Decor_Free.png", "region": Rect2(32, 64, 16, 16)},
+	"Gold": {"texture": "res://Assets/Outdoor decoration/Outdoor_Decor_Free.png", "region": Rect2(32, 96, 16, 16)},
+
 	# Add more resources here as needed
 }
 
@@ -24,6 +29,10 @@ var item_scenes = {
 	"RuneStone": "res://Scenes/rune_stone.tscn",
 	"MagicCompass": "res://Scenes/magic_compass.tscn",
 	"Crystal": "res://Scenes/crystal.tscn", # You'll need to create this scene
+	"StoneSword": "res://Scenes/stone_sword.tscn",
+	"StonePickaxe": "res://Scenes/stone_pickaxe.tscn",
+	"Iron": "res://Scenes/iron.tscn",
+	"Gold": "res://Scenes/gold.tscn",
 	# Add more items here as needed
 }
 

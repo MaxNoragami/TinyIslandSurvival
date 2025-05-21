@@ -1,12 +1,15 @@
-[gd_scene load_steps=4 format=3 uid="uid://c3wmutsax10st"]
+[gd_scene load_steps=6 format=3 uid="uid://c3wmutsax10st"]
 
+[ext_resource type="Script" uid="uid://c3p1l1xh1q4xi" path="res://Scripts/gold.gd" id="1_1lqfo"]
 [ext_resource type="Texture2D" uid="uid://d1nmuc8kutr6g" path="res://Assets/Outdoor decoration/Outdoor_Decor_Free.png" id="1_f32ux"]
 [ext_resource type="Script" uid="uid://dn7al0ge7nn5y" path="res://Scripts/hitbox_component.gd" id="2_1lqfo"]
+[ext_resource type="Script" uid="uid://dry5ni6xjdkby" path="res://Scripts/health_component.gd" id="4_q4j6m"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_b7x5c"]
 radius = 9.0
 
-[node name="Iron" type="Node2D"]
+[node name="Gold" type="Node2D"]
+script = ExtResource("1_1lqfo")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("1_f32ux")
@@ -26,3 +29,9 @@ shape = SubResource("CircleShape2D_b7x5c")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D"]
 polygon = PackedVector2Array(-7, 6, 0, 7, 7, 6, 6, -4, 1, -8, -5, -5)
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("4_q4j6m")
+max_health = 8.0
+current_health = 8.0
+metadata/_custom_type_script = "uid://dry5ni6xjdkby"
