@@ -5,18 +5,25 @@ extends Node
 @onready var equip_slot = $EquipSlotContainer/InventorySlot
 
 # Resource textures and regions mapping
-const resource_data = {
+# Changed from const to var to allow modification
+var resource_data = {
 	"Wood": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(144, 192, 16, 16)},
 	"Rock": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(160, 304, 16, 16)},
 	"StoneAxe": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(240, 1456, 16, 16)},
+	"RuneStone": {"texture": "res://Assets/Outdoor decoration/ancient_tablet.png", "region": Rect2(0, 0, 16, 16), "scale": Vector2(0.025, 0.025), "use_region": false},
+	"MagicCompass": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(80, 1056, 16, 16)},
+	"Crystal": {"texture": "res://Assets/Outdoor decoration/crystal.png", "scale": Vector2(0.03, 0.03), "use_region": false}, # Added Crystal item
 	# Add more resources here as needed
 }
 
 # Map item names to their scene paths
-const item_scenes = {
+var item_scenes = {
 	"Wood": "res://Scenes/wood.tscn",
 	"Rock": "res://Scenes/rock.tscn",
 	"StoneAxe": "res://Scenes/stone_axe.tscn",
+	"RuneStone": "res://Scenes/rune_stone.tscn",
+	"MagicCompass": "res://Scenes/magic_compass.tscn",
+	"Crystal": "res://Scenes/crystal.tscn", # You'll need to create this scene
 	# Add more items here as needed
 }
 
@@ -33,6 +40,16 @@ func _ready():
 	# Add self to InventoryUI group for easy access
 	add_to_group("InventoryUI")
 	
+	# Print registered items for debugging
+	print("=== INVENTORY SYSTEM INITIALIZED ===")
+	print("Registered items in resource_data:")
+	for item_name in resource_data:
+		print("- " + item_name + ": " + resource_data[item_name]["texture"])
+	
+	print("Registered items in item_scenes:")
+	for item_name in item_scenes:
+		print("- " + item_name + ": " + item_scenes[item_name])
+	
 	# Make sure the inventory is initially hidden
 	if out_margin:
 		out_margin.visible = false
@@ -47,6 +64,7 @@ func _ready():
 	
 	# Get references to all inventory slots and connect their buttons
 	if grid_container:
+		print("Found " + str(grid_container.get_child_count()) + " children in grid container")
 		for child in grid_container.get_children():
 			if "InventorySlot" in child.name:
 				inventory_slots.append(child)
@@ -60,6 +78,8 @@ func _ready():
 				var drop_button = child.get_node_or_null("DropButton")
 				if drop_button:
 					drop_button.pressed.connect(_on_drop_button_pressed.bind(child))
+		
+		print("Found " + str(inventory_slots.size()) + " inventory slots")
 	
 	# Start looking for the player
 	find_player()
@@ -105,10 +125,15 @@ func update_equip_slot_from_selected():
 			target_sprite.texture = source_sprite.texture
 			target_sprite.region_enabled = source_sprite.region_enabled
 			target_sprite.region_rect = source_sprite.region_rect
+			target_sprite.scale = source_sprite.scale  # Copy scale too
 		
 		if source_label and target_label:
 			# Copy amount
 			target_label.text = source_label.text
+			
+		# Copy the item name meta
+		if currently_selected_slot.has_meta("item_name"):
+			equip_slot.set_meta("item_name", currently_selected_slot.get_meta("item_name"))
 
 # Clear the equip slot
 func clear_equip_slot():
@@ -119,9 +144,14 @@ func clear_equip_slot():
 		if sprite:
 			sprite.texture = null
 			sprite.region_enabled = false
+			sprite.scale = Vector2(1, 1)  # Reset scale
 		
 		if label:
 			label.text = ""
+			
+		# Clear meta
+		if equip_slot.has_meta("item_name"):
+			equip_slot.remove_meta("item_name")
 
 func find_player():
 	await get_tree().process_frame
@@ -203,9 +233,14 @@ func _update_inventory_display():
 		if sprite:
 			sprite.texture = null
 			sprite.region_enabled = false
+			sprite.scale = Vector2(1, 1)  # Reset scale
 		
 		if label:
 			label.text = ""
+			
+		# Clear item name meta
+		if slot.has_meta("item_name"):
+			slot.remove_meta("item_name")
 			
 		# Hide drop button when slot is empty
 		if drop_button:
@@ -221,20 +256,46 @@ func _update_inventory_display():
 			var label = slot.get_node_or_null("Label")
 			var drop_button = slot.get_node_or_null("DropButton")
 			
+			print("DEBUG: Adding " + item_name + " to slot " + str(slot_index))
+			
 			if sprite and resource_data.has(item_name):
-				sprite.texture = load(resource_data[item_name]["texture"])
-				sprite.region_enabled = true
-				sprite.region_rect = resource_data[item_name]["region"]
+				# Load the texture
+				var texture_path = resource_data[item_name]["texture"]
+				var texture = load(texture_path)
+				
+				if texture:
+					sprite.texture = texture
+					
+					# Check if this item has special display settings
+					if resource_data[item_name].has("use_region"):
+						sprite.region_enabled = resource_data[item_name]["use_region"]
+					else:
+						sprite.region_enabled = true
+					
+					if sprite.region_enabled:
+						sprite.region_rect = resource_data[item_name]["region"]
+					
+					# Check if this item has a custom scale
+					if resource_data[item_name].has("scale"):
+						sprite.scale = resource_data[item_name]["scale"]
+					else:
+						sprite.scale = Vector2(1, 1)  # Default scale
+					
+					print("DEBUG: Set sprite for " + item_name + 
+						  " region_enabled=" + str(sprite.region_enabled) + 
+						  " scale=" + str(sprite.scale))
+				else:
+					push_error("Failed to load texture: " + texture_path)
 			
 			if label:
 				label.text = str(amount)
 			
+			# Store item name in slot for reference
+			slot.set_meta("item_name", item_name)
+			
 			# Show drop button when slot has an item
 			if drop_button:
 				drop_button.visible = true
-			
-			# Store item name in the slot for reference when dropping
-			slot.set_meta("item_name", item_name)
 			
 			slot_index += 1
 

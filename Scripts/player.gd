@@ -109,11 +109,47 @@ func _physics_process(delta):
 		handle_movement()
 
 func _input(event):
-	# Handle item action (using equipped item)
+	# Handle tool actions (like axe) - Add this to fix the axe functionality
 	if event.is_action_pressed("item_action") and not is_performing_action and action_cooldown <= 0:
 		var equipped_item = get_equipped_item()
 		if equipped_item == "StoneAxe":
 			perform_action_with_item(equipped_item)
+			return  # Stop processing after performing action
+	
+	# TESTING KEYS FOR CRYSTAL CAVE
+	# IMPORTANT: Change this to use F1 instead of Space to avoid conflict
+	# This is the core fix - using a different key for testing
+	if event.is_action_pressed("ui_home"):  # F1 key instead of Space (ui_accept)
+		print("DEBUG: ALL-IN-ONE CRYSTAL CAVE TEST")
+		
+		# 1. Add RuneStone to inventory
+		add_to_inventory("RuneStone", 1)
+		print("Added RuneStone to inventory")
+		
+		# 2. Add StoneAxe to inventory 
+		add_to_inventory("StoneAxe", 1)
+		print("Added StoneAxe to inventory")
+		
+		# 3. Notify ClueSystem
+		var clue_system = get_tree().get_first_node_in_group("ClueSystem")
+		if clue_system:
+			print("Found ClueSystem, adding clue")
+			if clue_system.has_method("give_hint_for_location"):
+				clue_system.give_hint_for_location("cave_1")
+				print("Gave hint for cave_1")
+		
+		# 4. Set time to night
+		var time_system = get_tree().get_first_node_in_group("TimeSystem")
+		if time_system:
+			print("Found TimeSystem, setting to night")
+			if time_system.has_method("set_time_of_day"):
+				time_system.set_time_of_day("Night")
+				print("Set time to Night")
+		
+		# 5. Show message
+		var message_system = get_tree().get_first_node_in_group("MessageDisplay")
+		if message_system and message_system.has_method("show_message"):
+			message_system.show_message("ALL-IN-ONE TEST: Crystal Cave should now be visible!")
 
 # Get the currently equipped item from the equip slot
 func get_equipped_item():
@@ -135,6 +171,9 @@ func get_equipped_item():
 
 # Perform an action with the equipped item
 func perform_action_with_item(item_name):
+	if is_performing_action:
+		return  # Already performing an action
+		
 	if item_name == "StoneAxe":
 		# Play appropriate axe animation based on facing direction
 		is_performing_action = true
@@ -148,6 +187,60 @@ func perform_action_with_item(item_name):
 		if sprite:
 			sprite.play(animation_name)
 			print("Playing animation: ", animation_name)
+			
+		# Add direct tree detection for better hit detection
+		do_direct_action_check(item_name)
+
+# New function to directly check for objects in front of the player
+func do_direct_action_check(item_name):
+	var hit_distance = 24.0  # Distance to check in front of player
+	var hit_position = global_position
+	
+	# Determine direction vector based on facing direction
+	var direction_vector = Vector2.ZERO
+	if facing_direction == "front":
+		direction_vector = Vector2(0, 1)
+	elif facing_direction == "back":
+		direction_vector = Vector2(0, -1)
+	elif facing_direction == "right":
+		direction_vector = Vector2(1 if not sprite.flip_h else -1, 0)
+	
+	# Calculate hit position
+	hit_position += direction_vector * hit_distance
+	
+	# Debug visualization
+	print("Checking direct hit at: ", hit_position)
+	
+	# Check what we're hitting with a larger radius to catch nearby objects
+	var space_state = get_world_2d().direct_space_state
+	var query = PhysicsShapeQueryParameters2D.new()
+	var circle_shape = CircleShape2D.new()
+	circle_shape.radius = 12.0  # Generous radius to catch objects
+	
+	query.set_shape(circle_shape)
+	query.transform = Transform2D(0, hit_position)
+	query.collision_mask = 2  # Layer 2 (hitboxes)
+	
+	var results = space_state.intersect_shape(query)
+	print("Found ", results.size(), " potential targets")
+	
+	# Process hits
+	for result in results:
+		var collider = result["collider"]
+		if collider is Area2D:
+			var parent = collider.get_parent()
+			
+			# Skip self-collisions
+			if parent == self:
+				continue
+				
+			print("Direct hit detected on: ", parent.name)
+			
+			# Apply damage based on item
+			if parent and parent.has_method("take_damage"):
+				if item_name == "StoneAxe" and (parent.is_in_group("Trees") or parent.name.begins_with("Tree")):
+					parent.take_damage(1, self)
+					print("Direct tree damage applied!")
 
 # Position the action hitbox in front of the player based on facing direction
 func position_action_hitbox():
@@ -292,3 +385,25 @@ func get_inventory():
 # Forward the inventory updated signal
 func _on_inventory_updated():
 	emit_signal("inventory_updated")
+
+# Add this function to handle animation completion
+func _on_animation_finished():
+	# This will be called when an animation finishes playing
+	if sprite and sprite.animation and sprite.animation.begins_with("axe_"):
+		is_performing_action = false
+		action_timer = 0.0
+		
+		# Disable the action hitbox
+		if action_hitbox:
+			action_hitbox.monitoring = false
+			var shape = action_hitbox.get_node_or_null("CollisionShape2D")
+			if shape:
+				shape.disabled = true
+				
+		# Return to idle or walk animation
+		if state_machine and state_machine.current_state:
+			var state_name = state_machine.current_state.name.to_lower()
+			if state_name.begins_with("idle"):
+				play_animation("idle")
+			elif state_name.begins_with("move"):
+				play_animation("walk")
