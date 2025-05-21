@@ -90,6 +90,20 @@ func _ready():
 	collision_mask |= 4  # Add Layer 3 (pickup layer) to collision mask
 	if sprite and not sprite.is_connected("animation_finished", Callable(self, "_on_animation_finished")):
 		sprite.animation_finished.connect(Callable(self, "_on_animation_finished"))
+		
+	# Make sure all action animations are set to not loop
+	if sprite and sprite.sprite_frames:
+		var animations = ["axe_front", "axe_back", "axe_right", 
+						  "pickaxe_front", "pickaxe_back", "pickaxe_right",
+						  "slash_front", "slash_back", "slash_right"]
+						  
+		for anim in animations:
+			if sprite.sprite_frames.has_animation(anim):
+				sprite.sprite_frames.set_animation_loop(anim, false)
+	
+	# Ensure animation_finished signal is connected
+	if sprite and not sprite.is_connected("animation_finished", Callable(self, "_on_animation_finished")):
+		sprite.animation_finished.connect(Callable(self, "_on_animation_finished"))
 
 func _physics_process(delta):
 	if not player_alive:
@@ -142,10 +156,13 @@ func _input(event):
 
 	if event.is_action_pressed("item_action") and not is_performing_action and action_cooldown <= 0:
 		var equipped_item = get_equipped_item()
-		if equipped_item == "StoneAxe" or equipped_item == "StoneSword":
+		if equipped_item == "StoneAxe" or equipped_item == "StoneSword" or equipped_item == "StonePickaxe":
 			perform_action_with_item(equipped_item)
 
 # Get the currently equipped item from the equip slot
+# In player.gd, modify the get_equipped_item function to include StonePickaxe
+
+# Update get_equipped_item function
 func get_equipped_item():
 	var inventory_ui = get_tree().get_first_node_in_group("InventoryUI")
 	if inventory_ui and inventory_ui.equip_slot:
@@ -167,12 +184,19 @@ func get_equipped_item():
 			if region_rect.position.x == 176 and region_rect.position.y == 1760:
 				return "StoneSword"
 				
+			# Match the StonePickaxe region rect
+			if region_rect.position.x == 16 and region_rect.position.y == 1456:
+				return "StonePickaxe"
+				
 	return ""
 
+# Perform an action with the equipped item
+# Modify the perform_action_with_item function in player.gd
 # Perform an action with the equipped item
 func perform_action_with_item(item_name):
 	if is_performing_action:
 		return
+	
 	if item_name == "StoneAxe":
 		# Prevent interrupting a currently playing action animation
 		var animation_name = "axe_" + facing_direction
@@ -184,10 +208,14 @@ func perform_action_with_item(item_name):
 		action_timer = 0.0
 		action_cooldown = 0.2  # Add a slight cooldown to prevent spamming
 
-		# Play animation once
+		# Play animation once (not looping)
 		if sprite:
 			sprite.play(animation_name)
 			print("Playing animation: ", animation_name)
+			
+			# Ensure animation doesn't loop
+			if sprite.sprite_frames.has_animation(animation_name):
+				sprite.sprite_frames.set_animation_loop(animation_name, false)
 			
 		# Position and enable the action hitbox
 		position_action_hitbox()
@@ -211,6 +239,10 @@ func perform_action_with_item(item_name):
 			sprite.play(animation_name)
 			print("Playing sword animation: ", animation_name)
 			
+			# Ensure animation doesn't loop
+			if sprite.sprite_frames.has_animation(animation_name):
+				sprite.sprite_frames.set_animation_loop(animation_name, false)
+			
 		# Position and enable the action hitbox
 		position_action_hitbox()
 		
@@ -218,9 +250,38 @@ func perform_action_with_item(item_name):
 		if facing_direction == "right" and sprite.flip_h:
 			# We're facing left, so make sure the hitbox is positioned correctly
 			position_action_hitbox()
+			
+	elif item_name == "StonePickaxe":
+		# Use pickaxe animations
+		var animation_name = "pickaxe_" + facing_direction
+		if sprite and sprite.is_playing() and sprite.animation == animation_name:
+			return  # Already playing the animation; skip
+			
+		is_performing_action = true
+		Global.player_current_attack = true  # Set attack flag for damage detection
+		action_timer = 0.0
+		action_cooldown = 0.25  # Cooldown for pickaxe
+		
+		# Play animation once
+		if sprite:
+			sprite.play(animation_name)
+			print("Playing pickaxe animation: ", animation_name)
+			
+			# Ensure animation doesn't loop
+			if sprite.sprite_frames.has_animation(animation_name):
+				sprite.sprite_frames.set_animation_loop(animation_name, false)
+			
+		# Position and enable the action hitbox
+		position_action_hitbox()
+		
+		# Directly do a raycast to find what we're hitting
+		do_direct_action_check(item_name)
 
 # Do a direct raycast check to find what we're hitting
+# Update do_direct_action_check function to handle pickaxe
 func do_direct_action_check(item_name):
+	print("do_direct_action_check called with: ", item_name)
+	
 	var hit_distance = 24.0  # Distance to check in front of player
 	var hit_position = global_position
 	
@@ -255,6 +316,8 @@ func do_direct_action_check(item_name):
 	# Process hits
 	for result in results:
 		var collider = result["collider"]
+		print("Collider found: ", collider.name, " parent: ", collider.get_parent().name)
+		
 		if collider is Area2D:
 			var parent = collider.get_parent()
 			
@@ -263,6 +326,8 @@ func do_direct_action_check(item_name):
 				continue
 				
 			print("Direct hit detected on: ", parent.name)
+			print("Parent groups: ", parent.get_groups())
+			print("Parent has take_damage method: ", parent.has_method("take_damage"))
 			
 			# Apply damage based on item
 			if parent and parent.has_method("take_damage"):
@@ -272,6 +337,14 @@ func do_direct_action_check(item_name):
 				elif item_name == "StoneSword" and parent.has_method("skeleton"):
 					parent.take_damage(35, self)
 					print("Direct skeleton damage applied!")
+				elif item_name == "StonePickaxe":
+					# Check if it's an ore
+					if parent.is_in_group("Ores") or parent.name.begins_with("Iron") or parent.name.begins_with("Stone") or parent.name.begins_with("Gold"):
+						print("Trying to damage ore: ", parent.name)
+						parent.take_damage(1, self)
+						print("Direct ore damage applied!")
+					else:
+						print("Object is not recognized as an ore: ", parent.name)
 
 # Position the action hitbox in front of the player based on facing direction
 func position_action_hitbox():
@@ -413,13 +486,15 @@ func die():
 		state_machine.set_process(false)  # Stop state updates
 
 
+# This is likely already done but check to make sure
 func _on_animation_finished():
-	var anim_name = sprite.animation  # Get current animation manually
+	var anim_name = sprite.animation
 	if anim_name == "death":
 		print("Death animation finished. Stopping physics.")
 		set_physics_process(false)
 		return
 
+	# Check for any action animations (axe, pickaxe, or sword)
 	if anim_name.begins_with("axe_") or anim_name.begins_with("slash_") or anim_name.begins_with("pickaxe_"):
 		print("Action animation finished")
 		is_performing_action = false
@@ -438,7 +513,6 @@ func _on_animation_finished():
 				play_animation("idle")
 			elif state_name.begins_with("move"):
 				play_animation("walk")
-
 # Apply knockback when hit
 func apply_knockback(direction):
 	velocity = direction

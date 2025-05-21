@@ -10,6 +10,9 @@ const resource_data = {
 	"Rock": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(160, 304, 16, 16)},
 	"StoneAxe": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(240, 1456, 16, 16)},
 	"StoneSword": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(176, 1760, 16, 16)},
+	"StonePickaxe": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(16, 1456, 16, 16)},
+	"Iron": {"texture": "res://Assets/Outdoor decoration/Outdoor_Decor_Free.png", "region": Rect2(32, 64, 16, 16)},
+	"Gold": {"texture": "res://Assets/Outdoor decoration/Outdoor_Decor_Free.png", "region": Rect2(32, 96, 16, 16)},
 	# Add more resources here as needed
 }
 
@@ -19,6 +22,9 @@ const item_scenes = {
 	"Rock": "res://Scenes/rock.tscn",
 	"StoneAxe": "res://Scenes/stone_axe.tscn",
 	"StoneSword": "res://Scenes/stone_sword.tscn",
+	"StonePickaxe": "res://Scenes/stone_pickaxe.tscn",
+	"Iron": "res://Scenes/iron.tscn",
+	"Gold": "res://Scenes/gold.tscn",
 	# Add more items here as needed
 }
 
