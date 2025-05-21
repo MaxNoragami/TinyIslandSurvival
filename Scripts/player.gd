@@ -3,6 +3,8 @@ extends CharacterBody2D
 signal inventory_updated
 signal game_over
 @export var move_speed: float = 100.0
+@onready var sprite = $AnimatedSprite2D
+
 
 # Preload the InventoryComponent script
 const InventoryComponentScript = preload("res://Scripts/inventory_component.gd")
@@ -18,7 +20,6 @@ var knockback_velocity = Vector2.ZERO
 var health_component
 var hitbox_component
 var state_machine
-var sprite
 var inventory_component
 var action_hitbox
 
@@ -534,9 +535,23 @@ func attack():
 		$deal_attack_timer.start()
 
 func _show_damage_effect():
+	if not sprite:
+		return
+
+	# Kill any existing tweens affecting modulate
+	var existing_tweens = get_tree().get_nodes_in_group("PlayerTweens")
+	for tween in existing_tweens:
+		tween.kill()
+		tween.queue_free()
+
+	# Create a fresh tween
 	var tween = create_tween()
+	tween.set_trans(Tween.TRANS_LINEAR)
+	tween.set_ease(Tween.EASE_IN_OUT)
 	tween.tween_property(self, "modulate", Color(1, 0.5, 0.5), 0.1)
 	tween.tween_property(self, "modulate", Color(1, 1, 1), 0.1)
+
+
 
 # Add this at the bottom of your script
 func _on_attack_reset_timeout():

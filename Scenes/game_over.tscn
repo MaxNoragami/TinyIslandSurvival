@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://y042dp8kdtbf"]
+[gd_scene load_steps=9 format=3 uid="uid://brei3tff61c34"]
 
 [ext_resource type="FontFile" uid="uid://dylhu0n40j0n" path="res://Assets/Daydream.ttf" id="1_8fo1c"]
 [ext_resource type="Script" uid="uid://cplwaxi75hih1" path="res://Scenes/game_over.gd" id="1_m5628"]
@@ -10,6 +10,21 @@ default_font = ExtResource("1_8fo1c")
 bg_color = Color(0, 0, 0, 1)
 
 [sub_resource type="RichTextEffect" id="RichTextEffect_eoghk"]
+
+[sub_resource type="Animation" id="Animation_j3ryr"]
+length = 2.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Panel:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
 
 [sub_resource type="Animation" id="Animation_14u15"]
 resource_name = "show"
@@ -25,21 +40,6 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1.7411),
 "update": 0,
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 0.988235)]
-}
-
-[sub_resource type="Animation" id="Animation_j3ryr"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Panel:modulate")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(1, 1, 1, 1)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_rjluv"]
@@ -61,6 +61,7 @@ visible_ui = NodePath("Panel")
 animation_player = NodePath("AnimationPlayer")
 
 [node name="Panel" type="Panel" parent="."]
+modulate = Color(1, 1, 1, 0)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
