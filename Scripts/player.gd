@@ -94,9 +94,9 @@ func _ready():
 		
 	# Make sure all action animations are set to not loop
 	if sprite and sprite.sprite_frames:
-		var animations = ["axe_front", "axe_back", "axe_right", 
-						  "pickaxe_front", "pickaxe_back", "pickaxe_right",
-						  "slash_front", "slash_back", "slash_right"]
+		var animations = ["axe_front", "axe_back", "axe_right",
+			"pickaxe_front", "pickaxe_back", "pickaxe_right",
+			"slash_front", "slash_back", "slash_right"]
 						  
 		for anim in animations:
 			if sprite.sprite_frames.has_animation(anim):
@@ -108,7 +108,7 @@ func _ready():
 
 func _physics_process(delta):
 	if not player_alive:
-		return 
+		return
 	enemy_attack()
 	# Removed attack() call here
 	if health <= 0:
@@ -228,7 +228,7 @@ func get_equipped_item():
 				
 				# IRON TOOLS
 			if region_rect.position.x == 240 and region_rect.position.y == 1616:
-				print("DEBUG: Detected IronAxe")
+
 				return "IronAxe"
 			if region_rect.position.x == 224 and region_rect.position.y == 1600:
 				return "IronSword"
@@ -326,7 +326,7 @@ func perform_action_with_item(item_name):
 func do_direct_action_check(item_name, damage = 1):
 	print("do_direct_action_check called with: ", item_name, " damage: ", damage)
 	
-	var hit_distance = 32.0  # Increased distance
+	var hit_distance = 32.0
 	var hit_position = global_position
 	
 	# Determine direction vector based on facing direction
@@ -343,91 +343,106 @@ func do_direct_action_check(item_name, damage = 1):
 	
 	print("Checking direct hit at: ", hit_position, " from player at: ", global_position)
 	
-	# METHOD 1: Try shape collision detection
+	# Try shape collision detection
 	var space_state = get_world_2d().direct_space_state
 	var query = PhysicsShapeQueryParameters2D.new()
 	var circle_shape = CircleShape2D.new()
-	circle_shape.radius = 20.0  # Increased radius
+	circle_shape.radius = 20.0
 	
 	query.set_shape(circle_shape)
 	query.transform = Transform2D(0, hit_position)
-	query.collision_mask = 2  # Layer 2 (hitboxes)
+	query.collision_mask = 7  # Check layers 1, 2, and 3
 	
 	var results = space_state.intersect_shape(query)
 	print("Shape query found ", results.size(), " potential targets")
 	
-	# METHOD 2: If shape query fails, try raycast
-	if results.size() == 0:
-		print("Trying raycast method...")
-		var ray_query = PhysicsRayQueryParameters2D.new()
-		ray_query.from = global_position
-		ray_query.to = hit_position
-		ray_query.collision_mask = 2  # Layer 2 (hitboxes)
-		
-		var ray_result = space_state.intersect_ray(ray_query)
-		if ray_result:
-			print("Raycast hit: ", ray_result.collider.name if ray_result.collider else "unknown")
-			results = [{"collider": ray_result.collider}]
-	
-	# METHOD 3: If both fail, try broader area search
-	if results.size() == 0:
-		print("Trying broader area search...")
-		query.collision_mask = 7  # Try layers 1, 2, and 3
-		circle_shape.radius = 30.0  # Even bigger radius
-		query.set_shape(circle_shape)
-		results = space_state.intersect_shape(query)
-		print("Broader search found ", results.size(), " targets")
-	
-	# METHOD 4: Last resort - check nearby trees directly
-	if results.size() == 0 and item_name.ends_with("Axe"):
-		print("Last resort: checking trees in group...")
-		var trees = get_tree().get_nodes_in_group("Trees")
-		for tree in trees:
-			var distance = global_position.distance_to(tree.global_position)
-			if distance < 50.0:  # Within 50 pixels
-				print("Found nearby tree: ", tree.name, " at distance: ", distance)
-				# Manually call the tree's take_damage function
-				if tree.has_method("take_damage"):
-					tree.take_damage(damage, self)
-					print("Manually damaged tree!")
-					return
-	
-	# Process normal collision results
+	# Process collision results
 	for result in results:
 		var collider = result["collider"]
 		
 		if not collider:
 			continue
 			
-		print("Collider found: ", collider.name if collider else "null", " parent: ", collider.get_parent().name if collider.get_parent() else "null")
+		print("Collider found: ", collider.name if collider else "null", " type: ", collider.get_class())
 		
+		var target = null
+		
+		# FIXED: Handle different collider types
 		if collider is Area2D:
-			var parent = collider.get_parent()
+			# This is probably a HitboxComponent - get its parent
+			target = collider.get_parent()
+			print("Area2D collider - checking parent: ", target.name if target else "null")
+		elif collider is StaticBody2D or collider is CharacterBody2D:
+			# This is probably a tree's StaticBody2D - get its parent  
+			target = collider.get_parent()
+			print("Body collider - checking parent: ", target.name if target else "null")
+		else:
+			# Direct node collision
+			target = collider
+			print("Direct collider")
+		
+		# Skip self-collisions
+		if target == self:
+			print("Skipping self-collision")
+			continue
 			
-			# Skip self-collisions
-			if parent == self:
-				continue
+		if not target:
+			print("No valid target found")
+			continue
+			
+		print("Final target: ", target.name, " groups: ", target.get_groups())
+		
+		# Apply damage based on item type
+		if target.has_method("take_damage"):
+			print("Target has take_damage method")
+			
+			if item_name.ends_with("Axe") and (target.is_in_group("Trees") or target.name.begins_with("Tree")):
+				print("CALLING tree.take_damage with damage: ", damage)
+				target.take_damage(damage, self)
+				print("Tree damage call completed")
+				return
 				
-			print("Direct hit detected on: ", parent.name)
-			print("Parent groups: ", parent.get_groups())
-			
-			# Apply damage based on item type
-			if parent and parent.has_method("take_damage"):
-				if item_name.ends_with("Axe") and (parent.is_in_group("Trees") or parent.name.begins_with("Tree")):
-					parent.take_damage(damage, self)
-					print("Direct tree damage applied! (", damage, " damage)")
+			elif item_name.ends_with("Sword") and target.has_method("skeleton"):
+				print("CALLING skeleton.take_damage with damage: ", damage)
+				target.take_damage(damage, self)
+				print("Skeleton damage call completed")
+				return
+				
+			elif item_name.ends_with("Pickaxe"):
+				# Check if it's an ore
+				if target.is_in_group("Ores") or target.name.begins_with("Iron") or target.name.begins_with("Stone") or target.name.begins_with("Gold"):
+					print("CALLING ore.take_damage with damage: ", damage)
+					target.take_damage(damage, self)
+					print("Ore damage call completed")
 					return
-				elif item_name.ends_with("Sword") and parent.has_method("skeleton"):
-					parent.take_damage(damage, self)
-					print("Direct skeleton damage applied! (", damage, " damage)")
-					return
-				elif item_name.ends_with("Pickaxe"):
-					# Check if it's an ore
-					if parent.is_in_group("Ores") or parent.name.begins_with("Iron") or parent.name.begins_with("Stone") or parent.name.begins_with("Gold"):
-						print("Trying to damage ore: ", parent.name)
-						parent.take_damage(damage, self)
-						print("Direct ore damage applied! (", damage, " damage)")
-						return
+		else:
+			print("Target does not have take_damage method")
+	
+	print("No valid targets found to damage")
+
+# Also add this helper function to player.gd for easier debugging:
+func debug_nearby_objects():
+	print("=== NEARBY OBJECTS DEBUG ===")
+	var space_state = get_world_2d().direct_space_state
+	var query = PhysicsShapeQueryParameters2D.new()
+	var circle_shape = CircleShape2D.new()
+	circle_shape.radius = 50.0
+	
+	query.set_shape(circle_shape)
+	query.transform = Transform2D(0, global_position)
+	query.collision_mask = 7  # All layers
+	
+	var results = space_state.intersect_shape(query)
+	print("Found ", results.size(), " nearby objects:")
+	
+	for i in range(results.size()):
+		var result = results[i]
+		var collider = result["collider"]
+		var parent = collider.get_parent() if collider else null
+		
+		print("  ", i, ": ", collider.name if collider else "null",
+			" (", collider.get_class() if collider else "null", ") parent: ",
+			parent.name if parent else "null")
 
 # Position the action hitbox in front of the player based on facing direction
 func position_action_hitbox():
@@ -497,7 +512,7 @@ func handle_movement():
 # Update the facing direction based on movement
 func update_facing_direction(direction):
 	if not player_alive:
-		return 
+		return
 	var old_direction = facing_direction
 	
 	if abs(direction.x) > abs(direction.y):
@@ -633,7 +648,7 @@ func _on_hitbox_component_body_entered(body):
 	if body.has_method("skeleton"):
 		enemy_inattack_range = true
 		var direction = (position - body.position).normalized()
-		knockback_velocity = direction * 100  
+		knockback_velocity = direction * 100
 
 
 func _on_hitbox_component_body_exited(body):
