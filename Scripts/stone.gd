@@ -1,12 +1,12 @@
-# stone_ore.gd - Fixed version
+# iron_ore.gd - Fixed version with all pickaxe types support
 
 extends Node2D
 
-# Resource properties for Stone ore
+# Resource properties for iron ore
 @export var max_health: int = 3
 @export var current_health: int = 3
 @export var stone_drop_min: int = 1
-@export var stone_drop_max: int = 2
+@export var stone_drop_max: int = 2  # Reduced maximum to prevent too many drops
 @export var respawn_time: float = 30.0
 
 # References to components
@@ -60,9 +60,18 @@ func _process(delta):
 	# Check for damage from the player's current action
 	if player_in_range and player_ref and player_ref.is_performing_action:
 		var equipped_item = player_ref.get_equipped_item()
-		if equipped_item == "StonePickaxe" and Global.player_current_attack:
-			print("Stone ore detected pickaxe attack from global state")
-			take_damage(1, player_ref)
+		# FIXED: Check if it ends with "Pickaxe" instead of specific pickaxe type
+		if equipped_item.ends_with("Pickaxe") and Global.player_current_attack:
+			print("Stone ore detected pickaxe attack from global state with: " + equipped_item)
+			
+			# Calculate damage based on pickaxe type
+			var damage = 1
+			if equipped_item.begins_with("Iron"):
+				damage = 2  # Iron pickaxe mines faster
+			elif equipped_item.begins_with("Gold"):
+				damage = 1  # Gold pickaxe same damage but faster cooldown (handled in player)
+			
+			take_damage(damage, player_ref)
 			Global.player_current_attack = false  # Reset to prevent multiple hits
 
 # Function to identify this as an ore for player's detection
@@ -101,15 +110,15 @@ func take_damage(damage_amount: int = 1, damager = null):
 		print("Invalid damager")
 		return
 	
-	# Check if the player is using a pickaxe
+	# Check if the player is using a pickaxe - FIXED to accept any pickaxe type
 	var equipped_item = damager.get_equipped_item()
-	if equipped_item != "StonePickaxe":
-		print("Not being hit with a pickaxe")
+	if not equipped_item.ends_with("Pickaxe"):
+		print("Not being hit with a pickaxe, equipped item: " + str(equipped_item))
 		# Give feedback that a pickaxe is needed
 		_show_wrong_tool_effect()
 		return
 	
-	print("Stone ore: Taking damage: " + str(damage_amount))
+	print("Stone ore: Taking damage: " + str(damage_amount) + " from " + equipped_item)
 	
 	# Apply damage to the ore
 	if health_component:
@@ -195,7 +204,7 @@ func respawn_ore():
 	_show_respawn_effect()
 	print("Stone ore respawned!")
 
-# Drop Stone resources when mined - FIXED VERSION
+# Drop iron resources when mined - FIXED VERSION
 func _drop_resources():
 	# Safety check to prevent multiple calls
 	if resources_dropped:
@@ -233,24 +242,24 @@ func _drop_resources():
 		print("Could not find OtherItems container, using PickableItems instead")
 		target_container = pickable_items
 	
-	# Spawn the Stone resources
+	# Spawn the Iron resources
 	for i in range(drop_count):
 		var resource = rock_scene.instantiate()
 		
-		# Update the sprite to show stone texture
+		# Update the sprite to show iron texture
 		var sprite_node = resource.get_node_or_null("Sprite2D")
 		if sprite_node:
-			# Use the stone texture from Icons/16x16.png
+			# Use the iron texture from Outdoor_Decor_Free.png
 			var texture = load("res://Assets/Icons/16x16.png")
 			if texture:
 				sprite_node.texture = texture
 				sprite_node.region_enabled = true
-				sprite_node.region_rect = Rect2(160, 304, 16, 16)  # Stone texture region (same as Rock)
+				sprite_node.region_rect = Rect2(160, 304, 16, 16)  # Iron texture region
 		
-		# IMPORTANT FIX: Set up the pickup component to drop "Stone" items
+		# IMPORTANT FIX: Set up the pickup component to drop "Iron" items
 		var pickup = resource.get_node_or_null("PickupComponent")
 		if pickup:
-			pickup.item_name = "Stone"  # This makes it drop as "Stone" instead of "Rock"
+			pickup.item_name = "Stone"  # This makes it drop as "Iron" instead of "Rock"
 			pickup.item_quantity = 1
 		
 		# FIXED: Safer way to update resource properties
