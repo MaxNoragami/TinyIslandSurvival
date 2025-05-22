@@ -152,6 +152,7 @@ func _physics_process(delta):
 		handle_movement()
 
 func _input(event):
+
 	if not player_alive:
 		return  # Ignore input when dead
 
@@ -159,6 +160,42 @@ func _input(event):
 		var equipped_item = get_equipped_item()
 		if equipped_item == "StoneAxe" or equipped_item == "StoneSword" or equipped_item == "StonePickaxe":
 			perform_action_with_item(equipped_item)
+			return  # Stop processing after performing action
+	
+	# TESTING KEYS FOR CRYSTAL CAVE
+	# IMPORTANT: Change this to use F1 instead of Space to avoid conflict
+	# This is the core fix - using a different key for testing
+	if event.is_action_pressed("ui_home"):  # F1 key instead of Space (ui_accept)
+		print("DEBUG: ALL-IN-ONE CRYSTAL CAVE TEST")
+		
+		# 1. Add RuneStone to inventory
+		add_to_inventory("RuneStone", 1)
+		print("Added RuneStone to inventory")
+		
+		# 2. Add StoneAxe to inventory 
+		add_to_inventory("StoneAxe", 1)
+		print("Added StoneAxe to inventory")
+		
+		# 3. Notify ClueSystem
+		var clue_system = get_tree().get_first_node_in_group("ClueSystem")
+		if clue_system:
+			print("Found ClueSystem, adding clue")
+			if clue_system.has_method("give_hint_for_location"):
+				clue_system.give_hint_for_location("cave_1")
+				print("Gave hint for cave_1")
+		
+		# 4. Set time to night
+		var time_system = get_tree().get_first_node_in_group("TimeSystem")
+		if time_system:
+			print("Found TimeSystem, setting to night")
+			if time_system.has_method("set_time_of_day"):
+				time_system.set_time_of_day("Night")
+				print("Set time to Night")
+		
+		# 5. Show message
+		var message_system = get_tree().get_first_node_in_group("MessageDisplay")
+		if message_system and message_system.has_method("show_message"):
+			message_system.show_message("ALL-IN-ONE TEST: Crystal Cave should now be visible!")
 
 # Get the currently equipped item from the equip slot
 # In player.gd, modify the get_equipped_item function to include StonePickaxe
@@ -317,8 +354,10 @@ func do_direct_action_check(item_name):
 	# Process hits
 	for result in results:
 		var collider = result["collider"]
+
 		print("Collider found: ", collider.name, " parent: ", collider.get_parent().name)
 		
+
 		if collider is Area2D:
 			var parent = collider.get_parent()
 			
@@ -327,9 +366,10 @@ func do_direct_action_check(item_name):
 				continue
 				
 			print("Direct hit detected on: ", parent.name)
+
 			print("Parent groups: ", parent.get_groups())
 			print("Parent has take_damage method: ", parent.has_method("take_damage"))
-			
+
 			# Apply damage based on item
 			if parent and parent.has_method("take_damage"):
 				if item_name == "StoneAxe" and (parent.is_in_group("Trees") or parent.name.begins_with("Tree")):
@@ -545,7 +585,6 @@ func get_inventory():
 # Forward the inventory updated signal
 func _on_inventory_updated():
 	emit_signal("inventory_updated")
-
 
 func _on_hitbox_component_body_entered(body):
 	print("Body entered hitbox: ", body.name)

@@ -1,0 +1,101 @@
+[gd_scene load_steps=11 format=3 uid="uid://cpcr4k85tk75x"]
+
+[ext_resource type="Script" uid="uid://cnjkki0jsx805" path="res://Scripts/hidden_location.gd" id="1_bdx5x"]
+[ext_resource type="Script" uid="uid://c0x8rynbfq7hv" path="res://Scripts/time_conditioned_objects.gd" id="1_y3qa2"]
+[ext_resource type="Script" uid="uid://dwv43kkrm5uvn" path="res://Scripts/stone_pillar_puzzle.gd" id="2_m6jnk"]
+[ext_resource type="Texture2D" uid="uid://nqea3soj305j" path="res://Assets/Outdoor decoration/crystal_cave.png" id="2_yj7on"]
+[ext_resource type="Texture2D" uid="uid://cest7g4w4uwrn" path="res://Assets/Outdoor decoration/pillar.png" id="3_y3qa2"]
+[ext_resource type="Texture2D" uid="uid://cw1074e3vsdyi" path="res://Assets/Outdoor decoration/crystal.png" id="4_m6jnk"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_d65m2"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_bdx5x"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_yj7on"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_diooo"]
+
+[node name="CrystalCave" type="Node2D"]
+scale = Vector2(0.05, 0.05)
+script = ExtResource("1_bdx5x")
+location_name = "Crystal Cave"
+enter_message = "You discovered a hidden cave filled with glowing crystals!"
+completion_message = "The pillars light up in unison, revealing a hidden compartment!"
+
+[node name="EntranceSprite" type="Sprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_yj7on")
+
+[node name="EntranceCollision" type="CollisionShape2D" parent="."]
+
+[node name="InteractionArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea"]
+one_way_collision_margin = 70.1
+
+[node name="PuzzleArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PuzzleArea"]
+one_way_collision_margin = 102.1
+
+[node name="RewardSprite" type="Sprite2D" parent="."]
+visible = false
+
+[node name="TimeConditionedObject" type="Node" parent="."]
+script = ExtResource("1_y3qa2")
+
+[node name="StonePillarPuzzle" type="Node2D" parent="."]
+script = ExtResource("2_m6jnk")
+
+[node name="Pillar1" type="Sprite2D" parent="StonePillarPuzzle"]
+position = Vector2(-400, -400)
+texture = ExtResource("3_y3qa2")
+region_rect = Rect2(96, 112, 32, 48)
+
+[node name="InteractionArea" type="Area2D" parent="StonePillarPuzzle/Pillar1"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StonePillarPuzzle/Pillar1/InteractionArea"]
+visibility_layer = 13
+shape = SubResource("CircleShape2D_d65m2")
+
+[node name="Pillar2" type="Sprite2D" parent="StonePillarPuzzle"]
+position = Vector2(400, -400)
+texture = ExtResource("3_y3qa2")
+region_rect = Rect2(96, 112, 32, 48)
+
+[node name="InteractionArea" type="Area2D" parent="StonePillarPuzzle/Pillar2"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StonePillarPuzzle/Pillar2/InteractionArea"]
+visibility_layer = 13
+shape = SubResource("CircleShape2D_bdx5x")
+
+[node name="Pillar3" type="Sprite2D" parent="StonePillarPuzzle"]
+position = Vector2(400, 400)
+texture = ExtResource("3_y3qa2")
+region_rect = Rect2(96, 112, 32, 48)
+
+[node name="InteractionArea" type="Area2D" parent="StonePillarPuzzle/Pillar3"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StonePillarPuzzle/Pillar3/InteractionArea"]
+visibility_layer = 13
+shape = SubResource("CircleShape2D_yj7on")
+
+[node name="Pillar4" type="Sprite2D" parent="StonePillarPuzzle"]
+position = Vector2(-400, 400)
+texture = ExtResource("3_y3qa2")
+region_rect = Rect2(85, 72, 32, 48)
+
+[node name="InteractionArea" type="Area2D" parent="StonePillarPuzzle/Pillar4"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StonePillarPuzzle/Pillar4/InteractionArea"]
+visibility_layer = 13
+shape = SubResource("CircleShape2D_diooo")
+
+[node name="Center" type="Sprite2D" parent="StonePillarPuzzle"]
+visible = false
+scale = Vector2(0.35, 0.35)
+texture = ExtResource("4_m6jnk")
+
+[node name="RewardSprite2" type="Sprite2D" parent="."]
+visible = false
+texture = ExtResource("4_m6jnk")

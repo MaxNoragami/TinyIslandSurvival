@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://erd5qpm8sraw"]
+[gd_scene load_steps=22 format=3 uid="uid://erd5qpm8sraw"]
 
 [ext_resource type="PackedScene" uid="uid://biuw3yy44r8vd" path="res://Scenes/inventory_ui.tscn" id="1_3dryh"]
 [ext_resource type="PackedScene" uid="uid://x4w6s15w1q3" path="res://Scenes/world.tscn" id="1_ebmjs"]
@@ -12,8 +12,15 @@
 [ext_resource type="Script" uid="uid://bkvpboislfeik" path="res://Scripts/ore_spawner.gd" id="7_1l0tm"]
 [ext_resource type="PackedScene" uid="uid://4qgoaa3ivu3f" path="res://Scenes/stone_axe.tscn" id="7_ldgsr"]
 [ext_resource type="PackedScene" uid="uid://cpva6ufsf0e4a" path="res://Scenes/stone_sword.tscn" id="8_rku1e"]
+[ext_resource type="Script" uid="uid://jk4y3t3rplve" path="res://Scenes/runestone.gd" id="10_vm72l"]
+[ext_resource type="Script" uid="uid://jsd6o8omlw5a" path="res://Scripts/pickup_component.gd" id="11_22asu"]
+[ext_resource type="Texture2D" uid="uid://qf2utkjrpxiq" path="res://Assets/Outdoor decoration/ancient_tablet.png" id="11_fkdbe"]
 [ext_resource type="PackedScene" uid="uid://qilno75ul2ds" path="res://Scenes/skeleton.tscn" id="11_o5yvi"]
-[ext_resource type="Script" uid="uid://dkkqpoqevnu5j" path="res://Scenes/enemy_spawn.gd" id="13_rfjv2"]
+[ext_resource type="Script" path="res://Scenes/enemy_spawn.gd" id="13_rfjv2"]
+[ext_resource type="Script" uid="uid://5uuf5mhdrmct" path="res://Scenes/debug_helper.gd" id="15_nb51f"]
+[ext_resource type="Script" uid="uid://bm4pfme2tntb8" path="res://Scenes/universal_pickup_helper.gd" id="16_nnt18"]
+[ext_resource type="Script" uid="uid://d0l7evypjg47g" path="res://Scenes/inventory_fix_helper.gd" id="17_ewbju"]
+[ext_resource type="PackedScene" uid="uid://cpcr4k85tk75x" path="res://Scenes/CrystalCave.tscn" id="21_exi56"]
 
 [node name="Game" type="Node"]
 
@@ -65,6 +72,21 @@ position = Vector2(1351, 135)
 [node name="StoneSword" parent="PickableItems/OtherItems" instance=ExtResource("8_rku1e")]
 position = Vector2(1383, 144)
 
+[node name="RuneStone" type="Node2D" parent="PickableItems/OtherItems"]
+position = Vector2(300, 300)
+script = ExtResource("10_vm72l")
+
+[node name="Sprite2D" type="Sprite2D" parent="PickableItems/OtherItems/RuneStone"]
+position = Vector2(150, 150)
+scale = Vector2(0.015, 0.015)
+texture = ExtResource("11_fkdbe")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickableItems/OtherItems/RuneStone"]
+
+[node name="PickupComponent" type="Node" parent="PickableItems/OtherItems/RuneStone"]
+script = ExtResource("11_22asu")
+item_name = "RuneStone"
+
 [node name="Trees" type="Node" parent="."]
 script = ExtResource("6_8128m")
 tree_scene = ExtResource("5_wowpa")
@@ -80,3 +102,15 @@ num_ores = 300
 [node name="EnemySpawn" type="Node" parent="."]
 script = ExtResource("13_rfjv2")
 enemy_scene = ExtResource("11_o5yvi")
+
+[node name="DebugHelper" type="Node" parent="."]
+script = ExtResource("15_nb51f")
+
+[node name="UniversalPickupHelper" type="Node" parent="."]
+script = ExtResource("16_nnt18")
+
+[node name="InventoryFixHelper" type="Node" parent="."]
+script = ExtResource("17_ewbju")
+
+[node name="CrystalCave" parent="." instance=ExtResource("21_exi56")]
+position = Vector2(-94, 46)
