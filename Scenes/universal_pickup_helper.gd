@@ -41,6 +41,17 @@ func pickup_nearest_item():
 	# Get player position once
 	var player_pos = player.global_position
 	
+	# NEW: First, check if we're in the correct state to have crystals
+	# Only allow crystal pickup when the puzzle is solved
+	var crystal_cave = tree.get_first_node_in_group("HiddenLocations")
+	var pillar_puzzle = null
+	var puzzle_solved = false
+	
+	if crystal_cave:
+		pillar_puzzle = crystal_cave.get_node_or_null("StonePillarPuzzle")
+		if pillar_puzzle:
+			puzzle_solved = pillar_puzzle.is_solved
+	
 	# First check specifically for crystals
 	var crystals_group = tree.get_nodes_in_group("Crystals")
 	print("Found " + str(crystals_group.size()) + " crystals")
@@ -49,12 +60,18 @@ func pickup_nearest_item():
 	var found_crystal = null
 	var found_crystal_distance = 100.0  # Search within 100 pixels
 	
-	for crystal in crystals_group:
-		if crystal.visible:  # Only consider visible crystals
-			var distance = crystal.global_position.distance_to(player_pos)
-			if distance < found_crystal_distance:
-				found_crystal = crystal
-				found_crystal_distance = distance
+	# MODIFIED: Only look for crystals if the puzzle is solved
+	if puzzle_solved:
+		for crystal in crystals_group:
+			if crystal.visible:  # Only consider visible crystals
+				var distance = crystal.global_position.distance_to(player_pos)
+				if distance < found_crystal_distance:
+					found_crystal = crystal
+					found_crystal_distance = distance
+	else:
+		print("Puzzle not solved yet, ignoring crystals")
+		# Set found_crystal to null to skip crystal handling
+		found_crystal = null
 	
 	# If we found a crystal nearby, pick it up
 	if found_crystal != null:
@@ -109,7 +126,7 @@ func pickup_nearest_item():
 			
 			# Make sure to queue_free the crystal too after a short delay
 			# This ensures the pickup component can finish its work first
-			await get_tree().create_timer(0.1).timeout
+			await tree.create_timer(0.1).timeout
 			if is_instance_valid(found_crystal):
 				found_crystal.queue_free()
 				

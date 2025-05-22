@@ -21,28 +21,28 @@ func _input(event):
 	# Simpler debug keys with safer implementations
 	if event is InputEventKey and event.pressed:
 		# 1: Force RuneStone to inventory
-		if event.keycode == KEY_1:
-			force_add_runestone()
+		#if event.keycode == KEY_1:
+			#force_add_runestone()
 			
 		# 2: Toggle time
-		elif event.keycode == KEY_2:
+		if event.keycode == KEY_2:
 			toggle_time()
 			
 		# 3: Fix Crystal Cave
 		elif event.keycode == KEY_3:
 			fix_crystal_cave()
 			
-		# F: Fix Crystal Cave interaction
-		elif event.keycode == KEY_F:
-			fix_crystal_cave_interaction()
-			
-		# G: Give Crystal reward directly
-		elif event.keycode == KEY_G:
-			add_crystal_directly()
+		## F: Fix Crystal Cave interaction
+		#elif event.keycode == KEY_F:
+			#fix_crystal_cave_interaction()
+			#
+		## G: Give Crystal reward directly
+		#elif event.keycode == KEY_G:
+			#add_crystal_directly()
 			
 		# T: Force spawn Crystal for T key pickup
-		elif event.keycode == KEY_T:
-			spawn_physical_crystal()
+		#elif event.keycode == KEY_T:
+			#spawn_physical_crystal()
 			
 		# X: Fix inventory display
 		elif event.keycode == KEY_X:

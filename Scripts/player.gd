@@ -251,12 +251,7 @@ func perform_action_with_item(item_name):
 			sprite.play(animation_name)
 			print("Playing animation: ", animation_name)
 			
-		# Add direct tree detection for better hit detection
-		do_direct_action_check(item_name)
-
-# New function to directly check for objects in front of the player
-func do_direct_action_check(item_name):
-# Ensure animation doesn't loop
+			# Ensure animation doesn't loop
 			if sprite.sprite_frames.has_animation(animation_name):
 				sprite.sprite_frames.set_animation_loop(animation_name, false)
 			
@@ -325,7 +320,6 @@ func do_direct_action_check(item_name):
 func do_direct_action_check(item_name):
 	print("do_direct_action_check called with: ", item_name)
 	
->>>>>>> origin/main
 	var hit_distance = 24.0  # Distance to check in front of player
 	var hit_position = global_position
 	
@@ -381,9 +375,6 @@ func do_direct_action_check(item_name):
 				if item_name == "StoneAxe" and (parent.is_in_group("Trees") or parent.name.begins_with("Tree")):
 					parent.take_damage(1, self)
 					print("Direct tree damage applied!")
-
-
-
 				elif item_name == "StoneSword" and parent.has_method("skeleton"):
 					parent.take_damage(35, self)
 					print("Direct skeleton damage applied!")
@@ -594,28 +585,6 @@ func get_inventory():
 # Forward the inventory updated signal
 func _on_inventory_updated():
 	emit_signal("inventory_updated")
-
-# Add this function to handle animation completion
-func _on_animation_finished():
-	# This will be called when an animation finishes playing
-	if sprite and sprite.animation and sprite.animation.begins_with("axe_"):
-		is_performing_action = false
-		action_timer = 0.0
-		
-		# Disable the action hitbox
-		if action_hitbox:
-			action_hitbox.monitoring = false
-			var shape = action_hitbox.get_node_or_null("CollisionShape2D")
-			if shape:
-				shape.disabled = true
-				
-		# Return to idle or walk animation
-		if state_machine and state_machine.current_state:
-			var state_name = state_machine.current_state.name.to_lower()
-			if state_name.begins_with("idle"):
-				play_animation("idle")
-			elif state_name.begins_with("move"):
-				play_animation("walk")
 
 func _on_hitbox_component_body_entered(body):
 	print("Body entered hitbox: ", body.name)
