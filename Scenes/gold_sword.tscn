@@ -1,0 +1,36 @@
+[gd_scene load_steps=6 format=3 uid="uid://dj3dda842p82s"]
+
+[ext_resource type="Script" uid="uid://cm56dlug2rgkd" path="res://Scripts/resource.gd" id="1_f8q4o"]
+[ext_resource type="Texture2D" uid="uid://bfc7bh6qqpijg" path="res://Assets/Icons/16x16.png" id="2_mmhih"]
+[ext_resource type="Script" uid="uid://dn7al0ge7nn5y" path="res://Scripts/hitbox_component.gd" id="3_5ip2w"]
+[ext_resource type="Script" uid="uid://jsd6o8omlw5a" path="res://Scripts/pickup_component.gd" id="4_78htc"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_bmhhg"]
+radius = 1.41392
+height = 9.90748
+
+[node name="GoldSword" type="Node2D"]
+script = ExtResource("1_f8q4o")
+resource_name = "GoldSword"
+health = 10
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_mmhih")
+region_enabled = true
+region_rect = Rect2(224, 1520, 16, 16)
+
+[node name="HitboxComponent" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 2
+script = ExtResource("3_5ip2w")
+metadata/_custom_type_script = "uid://dn7al0ge7nn5y"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxComponent"]
+rotation = 0.805704
+shape = SubResource("CapsuleShape2D_bmhhg")
+
+[node name="PickupComponent" type="Node" parent="."]
+script = ExtResource("4_78htc")
+item_name = "GoldSword"
+metadata/_custom_type_script = "uid://jsd6o8omlw5a"

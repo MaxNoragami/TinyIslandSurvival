@@ -1,12 +1,12 @@
-# iron_ore.gd - Fixed version
+# stone_ore.gd - Fixed version
 
 extends Node2D
 
-# Resource properties for iron ore
-@export var max_health: int = 5
-@export var current_health: int = 5
-@export var iron_drop_min: int = 1
-@export var iron_drop_max: int = 2  # Reduced maximum to prevent too many drops
+# Resource properties for Stone ore
+@export var max_health: int = 3
+@export var current_health: int = 3
+@export var stone_drop_min: int = 1
+@export var stone_drop_max: int = 2
 @export var respawn_time: float = 30.0
 
 # References to components
@@ -25,7 +25,7 @@ var player_ref = null
 # Get references to all nodes on ready
 func _ready():
 	add_to_group("Ores")
-	add_to_group("IronOres")
+	add_to_group("StoneOres")
 	sprite = $Sprite2D if has_node("Sprite2D") else null
 	hitbox_component = $HitboxComponent if has_node("HitboxComponent") else null
 	static_body = $StaticBody2D if has_node("StaticBody2D") else null
@@ -48,7 +48,7 @@ func _ready():
 		
 		# Make sure hitbox is configured to detect player
 		hitbox_component.collision_mask |= 1  # Layer 1 (player)
-		print("Iron ore: Hitbox signals connected")
+		print("Stone ore: Hitbox signals connected")
 
 # Handle respawning over time
 func _process(delta):
@@ -61,7 +61,7 @@ func _process(delta):
 	if player_in_range and player_ref and player_ref.is_performing_action:
 		var equipped_item = player_ref.get_equipped_item()
 		if equipped_item == "StonePickaxe" and Global.player_current_attack:
-			print("Iron ore detected pickaxe attack from global state")
+			print("Stone ore detected pickaxe attack from global state")
 			take_damage(1, player_ref)
 			Global.player_current_attack = false  # Reset to prevent multiple hits
 
@@ -71,25 +71,25 @@ func ore():
 
 # Hitbox signal handlers
 func _on_hitbox_body_entered(body):
-	print("Iron ore: Body entered hitbox - " + body.name)
+	print("Stone ore: Body entered hitbox - " + body.name)
 	if body.is_in_group("Player") or body.has_method("player"):
 		player_in_range = true
 		player_ref = body
-		print("Iron ore: Player in range")
+		print("Stone ore: Player in range")
 
 func _on_hitbox_body_exited(body):
-	print("Iron ore: Body exited hitbox - " + body.name)
+	print("Stone ore: Body exited hitbox - " + body.name)
 	if body.is_in_group("Player") or body.has_method("player"):
 		player_in_range = false
 		player_ref = null
-		print("Iron ore: Player out of range")
+		print("Stone ore: Player out of range")
 
 # Handle damage when hit by a pickaxe
 func take_damage(damage_amount: int = 1, damager = null):
-	print("Iron ore take_damage called")
+	print("Stone ore take_damage called")
 	
 	if is_mined:
-		print("Iron ore already mined")
+		print("Stone ore already mined")
 		return
 	
 	# If no damager is provided, use the player_ref
@@ -109,7 +109,7 @@ func take_damage(damage_amount: int = 1, damager = null):
 		_show_wrong_tool_effect()
 		return
 	
-	print("Iron ore: Taking damage: " + str(damage_amount))
+	print("Stone ore: Taking damage: " + str(damage_amount))
 	
 	# Apply damage to the ore
 	if health_component:
@@ -129,7 +129,7 @@ func mine_ore():
 	if is_mined:
 		return
 	
-	print("Iron ore has been mined!")
+	print("Stone ore has been mined!")
 	is_mined = true
 	respawn_timer = 0.0
 	resources_dropped = false  # Reset this flag
@@ -161,7 +161,7 @@ func mine_ore():
 
 # Respawn the ore after the respawn timer
 func respawn_ore():
-	print("Iron ore respawning...")
+	print("Stone ore respawning...")
 	
 	is_mined = false
 	respawn_timer = 0.0
@@ -193,9 +193,9 @@ func respawn_ore():
 				child.set_deferred("disabled", false)
 	
 	_show_respawn_effect()
-	print("Iron ore respawned!")
+	print("Stone ore respawned!")
 
-# Drop iron resources when mined - FIXED VERSION
+# Drop Stone resources when mined - FIXED VERSION
 func _drop_resources():
 	# Safety check to prevent multiple calls
 	if resources_dropped:
@@ -204,7 +204,7 @@ func _drop_resources():
 	
 	resources_dropped = true  # Set flag to prevent multiple drops
 	
-	var drop_count = randi_range(iron_drop_min, iron_drop_max)
+	var drop_count = randi_range(stone_drop_min, stone_drop_max)
 	
 	# Load the rock.tscn as a base template
 	var rock_scene = load("res://Scenes/rock.tscn")
@@ -213,7 +213,7 @@ func _drop_resources():
 		print("Failed to load rock scene")
 		return
 	
-	print("Dropping " + str(drop_count) + " Iron resources")
+	print("Dropping " + str(drop_count) + " Stone resources")
 	
 	# Find the game root
 	var game_root = get_tree().root.get_node_or_null("Game")
@@ -233,29 +233,29 @@ func _drop_resources():
 		print("Could not find OtherItems container, using PickableItems instead")
 		target_container = pickable_items
 	
-	# Spawn the Iron resources
+	# Spawn the Stone resources
 	for i in range(drop_count):
 		var resource = rock_scene.instantiate()
 		
-		# Update the sprite to show iron texture
+		# Update the sprite to show stone texture
 		var sprite_node = resource.get_node_or_null("Sprite2D")
 		if sprite_node:
-			# Use the iron texture from Outdoor_Decor_Free.png
-			var texture = load("res://Assets/Outdoor decoration/Outdoor_Decor_Free.png")
+			# Use the stone texture from Icons/16x16.png
+			var texture = load("res://Assets/Icons/16x16.png")
 			if texture:
 				sprite_node.texture = texture
 				sprite_node.region_enabled = true
-				sprite_node.region_rect = Rect2(32, 64, 16, 16)  # Iron texture region
+				sprite_node.region_rect = Rect2(160, 304, 16, 16)  # Stone texture region (same as Rock)
 		
-		# IMPORTANT FIX: Set up the pickup component to drop "Iron" items
+		# IMPORTANT FIX: Set up the pickup component to drop "Stone" items
 		var pickup = resource.get_node_or_null("PickupComponent")
 		if pickup:
-			pickup.item_name = "Iron"  # This makes it drop as "Iron" instead of "Rock"
+			pickup.item_name = "Stone"  # This makes it drop as "Stone" instead of "Rock"
 			pickup.item_quantity = 1
 		
 		# FIXED: Safer way to update resource properties
 		if resource.has_method("set") and "resource_name" in resource:
-			resource.resource_name = "Iron"
+			resource.resource_name = "Stone"
 		
 		# Generate a random offset from the ore position
 		var angle = randf() * TAU  # Random angle in radians
@@ -267,7 +267,7 @@ func _drop_resources():
 		
 		# Add to the container
 		target_container.add_child(resource)
-		print("Dropped Iron resource " + str(i+1) + " of " + str(drop_count))
+		print("Dropped Stone resource " + str(i+1) + " of " + str(drop_count))
 
 # Visual effects for feedback
 func _show_damage_effect():

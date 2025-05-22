@@ -1,11 +1,13 @@
+# gold_ore.gd - Fixed version
+
 extends Node2D
 
 # Resource properties for gold ore
-@export var max_health: int = 8  # Gold is harder than iron
+@export var max_health: int = 8
 @export var current_health: int = 8
 @export var gold_drop_min: int = 1
 @export var gold_drop_max: int = 2
-@export var respawn_time: float = 60.0  # Gold takes longer to respawn
+@export var respawn_time: float = 45.0  # Longer respawn time for gold
 
 # References to components
 var sprite
@@ -15,7 +17,7 @@ var health_component
 
 # State tracking
 var is_mined = false
-var resources_dropped = false
+var resources_dropped = false  # Flag to prevent multiple drops
 var respawn_timer = 0.0
 var player_in_range = false
 var player_ref = null
@@ -130,7 +132,7 @@ func mine_ore():
 	print("Gold ore has been mined!")
 	is_mined = true
 	respawn_timer = 0.0
-	resources_dropped = false
+	resources_dropped = false  # Reset this flag
 	
 	# Show mining effect - make the ore appear broken
 	if sprite:
@@ -153,8 +155,9 @@ func mine_ore():
 			if child is CollisionShape2D or child is CollisionPolygon2D:
 				child.set_deferred("disabled", true)
 	
-	# Drop resources
-	call_deferred("_drop_resources")
+	# Drop resources - only do this once
+	if not resources_dropped:
+		call_deferred("_drop_resources")
 
 # Respawn the ore after the respawn timer
 func respawn_ore():
@@ -192,7 +195,7 @@ func respawn_ore():
 	_show_respawn_effect()
 	print("Gold ore respawned!")
 
-# Drop gold resources when mined
+# Drop gold resources when mined - FIXED VERSION
 func _drop_resources():
 	# Safety check to prevent multiple calls
 	if resources_dropped:
@@ -203,14 +206,14 @@ func _drop_resources():
 	
 	var drop_count = randi_range(gold_drop_min, gold_drop_max)
 	
-	# Use rock.tscn as a base and customize it for gold
+	# Load the rock.tscn as a base template
 	var rock_scene = load("res://Scenes/rock.tscn")
 	
 	if not rock_scene:
 		print("Failed to load rock scene")
 		return
 	
-	print("Dropping " + str(drop_count) + " gold resources")
+	print("Dropping " + str(drop_count) + " Gold resources")
 	
 	# Find the game root
 	var game_root = get_tree().root.get_node_or_null("Game")
@@ -230,32 +233,29 @@ func _drop_resources():
 		print("Could not find OtherItems container, using PickableItems instead")
 		target_container = pickable_items
 	
-	# Spawn the gold resources
+	# Spawn the Gold resources
 	for i in range(drop_count):
 		var resource = rock_scene.instantiate()
 		
-		# Customize the rock to be gold
-		if resource.has_method("set_resource_name"):
-			resource.set_resource_name("Gold")
-		elif resource.has_method("set_name_for_resource"):
-			resource.set_name_for_resource("Gold")
-		elif resource is ResourceType:
-			resource.resource_name = "Gold"
-		
-		# Try to change the sprite if possible
-		var sprite = resource.get_node_or_null("Sprite2D")
-		if sprite:
-			# Try to use the gold texture
+		# Update the sprite to show gold texture
+		var sprite_node = resource.get_node_or_null("Sprite2D")
+		if sprite_node:
+			# Use the gold texture from Outdoor_Decor_Free.png
 			var texture = load("res://Assets/Outdoor decoration/Outdoor_Decor_Free.png")
 			if texture:
-				sprite.texture = texture
-				sprite.region_enabled = true
-				sprite.region_rect = Rect2(32, 96, 16, 16)  # Gold texture region - adjust if needed
+				sprite_node.texture = texture
+				sprite_node.region_enabled = true
+				sprite_node.region_rect = Rect2(32, 96, 16, 16)  # Gold texture region
 		
-		# Set up the pickup component
+		# IMPORTANT FIX: Set up the pickup component to drop "Gold" items
 		var pickup = resource.get_node_or_null("PickupComponent")
 		if pickup:
-			pickup.item_name = "Gold"
+			pickup.item_name = "Gold"  # This makes it drop as "Gold" instead of "Rock"
+			pickup.item_quantity = 1
+		
+		# FIXED: Safer way to update resource properties
+		if resource.has_method("set") and "resource_name" in resource:
+			resource.resource_name = "Gold"
 		
 		# Generate a random offset from the ore position
 		var angle = randf() * TAU  # Random angle in radians
@@ -267,7 +267,7 @@ func _drop_resources():
 		
 		# Add to the container
 		target_container.add_child(resource)
-		print("Dropped gold resource " + str(i+1) + " of " + str(drop_count))
+		print("Dropped Gold resource " + str(i+1) + " of " + str(drop_count))
 
 # Visual effects for feedback
 func _show_damage_effect():

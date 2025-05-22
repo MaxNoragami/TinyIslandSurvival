@@ -9,6 +9,7 @@ extends Node
 var resource_data = {
 	"Wood": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(144, 192, 16, 16)},
 	"Rock": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(160, 304, 16, 16)},
+	"Stone": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(160, 304, 16, 16)},
 	"StoneAxe": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(240, 1456, 16, 16)},
 	"RuneStone": {"texture": "res://Assets/Outdoor decoration/ancient_tablet.png", "region": Rect2(0, 0, 16, 16), "scale": Vector2(0.025, 0.025), "use_region": false},
 	"MagicCompass": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(80, 1056, 16, 16)},
@@ -17,6 +18,14 @@ var resource_data = {
 	"StonePickaxe": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(16, 1456, 16, 16)},
 	"Iron": {"texture": "res://Assets/Outdoor decoration/Outdoor_Decor_Free.png", "region": Rect2(32, 64, 16, 16)},
 	"Gold": {"texture": "res://Assets/Outdoor decoration/Outdoor_Decor_Free.png", "region": Rect2(32, 96, 16, 16)},
+	
+	"GoldAxe": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(240, 1536, 16, 16)},
+	"GoldSword": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(224, 1520, 16, 16)},
+	"GoldPickaxe": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(16, 1536, 16, 16)},
+	
+	"IronAxe": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(240, 1616, 16, 16)},
+	"IronSword": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(224, 1600, 16, 16)},
+	"IronPickaxe": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(16, 1616, 16, 16)},
 
 	# Add more resources here as needed
 }
@@ -33,6 +42,18 @@ var item_scenes = {
 	"StonePickaxe": "res://Scenes/stone_pickaxe.tscn",
 	"Iron": "res://Scenes/iron.tscn",
 	"Gold": "res://Scenes/gold.tscn",
+	"Stone": "res://Scenes/stone.tscn",
+	
+	# IRON TOOLS (new - create these scenes)
+	"IronAxe": "res://Scenes/iron_axe.tscn",
+	"IronSword": "res://Scenes/iron_sword.tscn",
+	"IronPickaxe": "res://Scenes/iron_pickaxe.tscn",
+	
+	# GOLD TOOLS (new - create these scenes)
+	"GoldAxe": "res://Scenes/gold_axe.tscn",
+	"GoldSword": "res://Scenes/gold_sword.tscn",
+	"GoldPickaxe": "res://Scenes/gold_pickaxe.tscn",
+	
 	# Add more items here as needed
 }
 

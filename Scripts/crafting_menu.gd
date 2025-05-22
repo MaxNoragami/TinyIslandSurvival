@@ -22,6 +22,20 @@ const resource_data = {
 	"StoneAxe": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(240, 1456, 16, 16)},
 	"StoneSword": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(176, 1760, 16, 16)},
 	"StonePickaxe": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(16, 1456, 16, 16)},
+	
+	"GoldAxe": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(240, 1536, 16, 16)},
+	"GoldSword": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(224, 1520, 16, 16)},
+	"GoldPickaxe": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(16, 1536, 16, 16)},
+	
+	"IronAxe": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(240, 1616, 16, 16)},
+	"IronSword": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(224, 1600, 16, 16)},
+	"IronPickaxe": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(16, 1616, 16, 16)},
+	
+	
+	# ADD THESE NEW ENTRIES:
+	"Iron": {"texture": "res://Assets/Outdoor decoration/Outdoor_Decor_Free.png", "region": Rect2(32, 64, 16, 16)},
+	"Gold": {"texture": "res://Assets/Outdoor decoration/Outdoor_Decor_Free.png", "region": Rect2(32, 96, 16, 16)},
+	"Stone": {"texture": "res://Assets/Icons/16x16.png", "region": Rect2(160, 304, 16, 16)},  # Same as Rock for now
 	# Add more resources here as needed
 }
 
@@ -74,7 +88,74 @@ var recipes = [
 		],
 		"result": "StonePickaxe",
 		"count": 1
-	}
+	},
+	{
+		"pattern": [
+			"", "Rock", "",
+			"", "Rock", "",
+			"", "Wood", ""
+		],
+		"result": "StoneSword",
+		"count": 1
+	},
+	
+	# NEW ENHANCED TOOL RECIPES WITH IRON
+	{
+		"pattern": [
+			"Iron", "Iron", "",
+			"Iron", "Wood", "",
+			"", "Wood", ""
+		],
+		"result": "IronAxe",
+		"count": 1
+	},
+	{
+		"pattern": [
+			"Iron", "Iron", "Iron",
+			"", "Wood", "",
+			"", "Wood", ""
+		],
+		"result": "IronPickaxe",
+		"count": 1
+	},
+	{
+		"pattern": [
+			"", "Iron", "",
+			"", "Iron", "",
+			"", "Wood", ""
+		],
+		"result": "IronSword",
+		"count": 1
+	},
+	
+	# GOLD TOOL RECIPES (Premium tools)
+	{
+		"pattern": [
+			"Gold", "Gold", "",
+			"Gold", "Wood", "",
+			"", "Wood", ""
+		],
+		"result": "GoldAxe",
+		"count": 1
+	},
+	{
+		"pattern": [
+			"Gold", "Gold", "Gold",
+			"", "Wood", "",
+			"", "Wood", ""
+		],
+		"result": "GoldPickaxe",
+		"count": 1
+	},
+	{
+		"pattern": [
+			"", "Gold", "",
+			"", "Gold", "",
+			"", "Wood", ""
+		],
+		"result": "GoldSword",
+		"count": 1
+	},
 ]
 
 # Reference to the result slot
