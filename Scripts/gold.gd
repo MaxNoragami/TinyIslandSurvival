@@ -1,4 +1,4 @@
-# gold_ore.gd - Fixed version
+# gold_ore.gd - Fixed version with all pickaxe types support
 
 extends Node2D
 
@@ -60,9 +60,18 @@ func _process(delta):
 	# Check for damage from the player's current action
 	if player_in_range and player_ref and player_ref.is_performing_action:
 		var equipped_item = player_ref.get_equipped_item()
-		if equipped_item == "StonePickaxe" and Global.player_current_attack:
-			print("Gold ore detected pickaxe attack from global state")
-			take_damage(1, player_ref)
+		# FIXED: Check if it ends with "Pickaxe" instead of specific pickaxe type
+		if equipped_item.ends_with("Pickaxe") and Global.player_current_attack:
+			print("Gold ore detected pickaxe attack from global state with: " + equipped_item)
+			
+			# Calculate damage based on pickaxe type
+			var damage = 1
+			if equipped_item.begins_with("Iron"):
+				damage = 2  # Iron pickaxe mines faster
+			elif equipped_item.begins_with("Gold"):
+				damage = 1  # Gold pickaxe same damage but faster cooldown (handled in player)
+			
+			take_damage(damage, player_ref)
 			Global.player_current_attack = false  # Reset to prevent multiple hits
 
 # Function to identify this as an ore for player's detection
@@ -101,15 +110,15 @@ func take_damage(damage_amount: int = 1, damager = null):
 		print("Invalid damager")
 		return
 	
-	# Check if the player is using a pickaxe
+	# Check if the player is using a pickaxe - FIXED to accept any pickaxe type
 	var equipped_item = damager.get_equipped_item()
-	if equipped_item != "StonePickaxe":
-		print("Not being hit with a pickaxe")
+	if not equipped_item.ends_with("Pickaxe"):
+		print("Not being hit with a pickaxe, equipped item: " + str(equipped_item))
 		# Give feedback that a pickaxe is needed
 		_show_wrong_tool_effect()
 		return
 	
-	print("Gold ore: Taking damage: " + str(damage_amount))
+	print("Gold ore: Taking damage: " + str(damage_amount) + " from " + equipped_item)
 	
 	# Apply damage to the ore
 	if health_component:
