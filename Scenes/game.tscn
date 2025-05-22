@@ -16,7 +16,7 @@
 [ext_resource type="Script" uid="uid://jsd6o8omlw5a" path="res://Scripts/pickup_component.gd" id="11_22asu"]
 [ext_resource type="Texture2D" uid="uid://qf2utkjrpxiq" path="res://Assets/Outdoor decoration/ancient_tablet.png" id="11_fkdbe"]
 [ext_resource type="PackedScene" uid="uid://qilno75ul2ds" path="res://Scenes/skeleton.tscn" id="11_o5yvi"]
-[ext_resource type="Script" path="res://Scenes/enemy_spawn.gd" id="13_rfjv2"]
+[ext_resource type="Script" uid="uid://dkkqpoqevnu5j" path="res://Scenes/enemy_spawn.gd" id="13_rfjv2"]
 [ext_resource type="Script" uid="uid://5uuf5mhdrmct" path="res://Scenes/debug_helper.gd" id="15_nb51f"]
 [ext_resource type="Script" uid="uid://bm4pfme2tntb8" path="res://Scenes/universal_pickup_helper.gd" id="16_nnt18"]
 [ext_resource type="Script" uid="uid://d0l7evypjg47g" path="res://Scenes/inventory_fix_helper.gd" id="17_ewbju"]

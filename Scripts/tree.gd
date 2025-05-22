@@ -16,6 +16,8 @@ var health_component
 
 var is_cut_down = false
 var regrowth_timer = 0.0
+var player_in_range = false
+var player_ref = null
 
 func _ready():
 	add_to_group("Trees")
@@ -35,19 +37,66 @@ func _ready():
 
 	if tree_trunk:
 		tree_trunk.visible = false
+	
+	# Connect hitbox signals to track when player is in range
+	if hitbox_component:
+		if not hitbox_component.body_entered.is_connected(_on_hitbox_body_entered):
+			hitbox_component.body_entered.connect(_on_hitbox_body_entered)
+		if not hitbox_component.body_exited.is_connected(_on_hitbox_body_exited):
+			hitbox_component.body_exited.connect(_on_hitbox_body_exited)
+		
+		# Make sure hitbox is configured to detect player
+		hitbox_component.collision_mask |= 1  # Layer 1 (player)
+		print("Tree: Hitbox signals connected")
 
 func _process(delta):
 	if is_cut_down:
 		regrowth_timer += delta
 		if regrowth_timer >= regrowth_time:
 			regrow_tree()
+	
+	# NEW: Check for damage from the player's current action
+	if player_in_range and player_ref and player_ref.is_performing_action:
+		var equipped_item = player_ref.get_equipped_item()
+		# Check if player is using ANY type of axe
+		if equipped_item.ends_with("Axe") and Global.player_current_attack:
+			print("Tree detected axe attack from: ", equipped_item)
+			
+			# Calculate damage based on axe type
+			var damage = 1
+			if equipped_item == "IronAxe":
+				damage = 2  # Iron axe cuts faster
+			elif equipped_item == "GoldAxe":
+				damage = 1  # Gold axe same damage but faster cooldown (handled in player)
+			
+			take_damage(damage, player_ref)
+			Global.player_current_attack = false  # Reset to prevent multiple hits
+
+# NEW: Hitbox signal handlers
+func _on_hitbox_body_entered(body):
+	print("Tree: Body entered hitbox - " + body.name)
+	if body.is_in_group("Player") or body.has_method("player"):
+		player_in_range = true
+		player_ref = body
+		print("Tree: Player in range")
+
+func _on_hitbox_body_exited(body):
+	print("Tree: Body exited hitbox - " + body.name)
+	if body.is_in_group("Player") or body.has_method("player"):
+		player_in_range = false
+		player_ref = null
+		print("Tree: Player out of range")
 
 func take_damage(damage_amount: int = 1, damager = null):
-	print("Tree take_damage called")
+	print("Tree take_damage called with damage: ", damage_amount)
 
 	if is_cut_down:
 		print("Tree already cut down")
 		return
+
+	# If no damager is provided, use the player_ref
+	if damager == null:
+		damager = player_ref
 
 	if damager == null or not damager.is_in_group("Player"):
 		print("Invalid damager")
@@ -56,6 +105,16 @@ func take_damage(damage_amount: int = 1, damager = null):
 	if not damager.is_performing_action:
 		print("Player not performing action")
 		return
+	
+	# NEW: Check if player is using an axe
+	var equipped_item = damager.get_equipped_item()
+	if not equipped_item.ends_with("Axe"):
+		print("Not being chopped with an axe")
+		# Give feedback that an axe is needed
+		_show_wrong_tool_effect()
+		return
+
+	print("Tree: Taking damage: ", damage_amount, " from ", equipped_item)
 
 	if health_component:
 		health_component.take_damage(damage_amount)
@@ -134,7 +193,7 @@ func regrow_tree():
 		hitbox_component.set_deferred("monitoring", true)
 		hitbox_component.set_deferred("monitorable", true)
 		hitbox_component.set_deferred("collision_layer", 2)
-		hitbox_component.set_deferred("collision_mask", 2)
+		hitbox_component.set_deferred("collision_mask", 3)  # Layer 1 (player) + 2 (hitbox)
 		for child in hitbox_component.get_children():
 			if child is CollisionShape2D or child is CollisionPolygon2D:
 				child.set_deferred("disabled", false)
@@ -169,6 +228,12 @@ func _drop_resources():
 func _show_damage_effect():
 	var tween = create_tween()
 	tween.tween_property(self, "modulate", Color(1, 0.5, 0.5), 0.1)
+	tween.tween_property(self, "modulate", Color(1, 1, 1), 0.1)
+
+# NEW: Visual feedback when wrong tool is used
+func _show_wrong_tool_effect():
+	var tween = create_tween()
+	tween.tween_property(self, "modulate", Color(0.5, 0.5, 1), 0.1)
 	tween.tween_property(self, "modulate", Color(1, 1, 1), 0.1)
 
 func _show_regrowth_effect():

@@ -158,9 +158,9 @@ func _input(event):
 
 	if event.is_action_pressed("item_action") and not is_performing_action and action_cooldown <= 0:
 		var equipped_item = get_equipped_item()
-		if equipped_item == "StoneAxe" or equipped_item == "StoneSword" or equipped_item == "StonePickaxe":
+		if equipped_item.ends_with("Axe") or equipped_item.ends_with("Sword") or equipped_item.ends_with("Pickaxe"):
 			perform_action_with_item(equipped_item)
-			return  # Stop processing after performing action
+			return # Stop processing after performing action
 	
 	# TESTING KEYS FOR CRYSTAL CAVE
 	# IMPORTANT: Change this to use F1 instead of Space to avoid conflict
@@ -226,6 +226,26 @@ func get_equipped_item():
 			if region_rect.position.x == 16 and region_rect.position.y == 1456:
 				return "StonePickaxe"
 				
+				# IRON TOOLS
+			if region_rect.position.x == 240 and region_rect.position.y == 1616:
+				print("DEBUG: Detected IronAxe")
+				return "IronAxe"
+			if region_rect.position.x == 224 and region_rect.position.y == 1600:
+				return "IronSword"
+			if region_rect.position.x == 16 and region_rect.position.y == 1616:
+				return "IronPickaxe"
+				
+			# GOLD TOOLS
+			if region_rect.position.x == 240 and region_rect.position.y == 1536:
+				return "GoldAxe"
+			if region_rect.position.x == 224 and region_rect.position.y == 1520:
+				return "GoldSword"
+			if region_rect.position.x == 16 and region_rect.position.y == 1536:
+				return "GoldPickaxe"
+				
+			print("DEBUG: Unknown equipped item with region: ", region_rect)
+			
+	print("DEBUG: No equipped item detected")
 	return ""
 
 # Perform an action with the equipped item
@@ -235,92 +255,78 @@ func perform_action_with_item(item_name):
 	if is_performing_action:
 		return
 	
-	if item_name == "StoneAxe":
-		# Prevent interrupting a currently playing action animation
-		var animation_name = "axe_" + facing_direction
-		if sprite and sprite.is_playing() and sprite.animation == animation_name:
-			return  # Already playing the animation; skip
+	# Determine tool type and set damage/speed based on material
+	var tool_type = ""
+	var damage = 1
+	var cooldown = 0.2
+	
+	if item_name.ends_with("Axe"):
+		tool_type = "axe"
+		if item_name.begins_with("Stone"):
+			damage = 1
+			cooldown = 0.2
+		elif item_name.begins_with("Iron"):
+			damage = 2  # Iron tools are stronger
+			cooldown = 0.15  # And faster
+		elif item_name.begins_with("Gold"):
+			damage = 1  # Gold tools are fast but not stronger
+			cooldown = 0.1  # Very fast
+			
+	elif item_name.ends_with("Sword"):
+		tool_type = "slash"
+		if item_name.begins_with("Stone"):
+			damage = 35
+			cooldown = 0.3
+		elif item_name.begins_with("Iron"):
+			damage = 50  # Much stronger
+			cooldown = 0.25
+		elif item_name.begins_with("Gold"):
+			damage = 40  # Good damage
+			cooldown = 0.2  # Faster
+			
+	elif item_name.ends_with("Pickaxe"):
+		tool_type = "pickaxe"
+		if item_name.begins_with("Stone"):
+			damage = 1
+			cooldown = 0.25
+		elif item_name.begins_with("Iron"):
+			damage = 2  # Mines faster
+			cooldown = 0.2
+		elif item_name.begins_with("Gold"):
+			damage = 1  # Same damage as stone
+			cooldown = 0.15  # But much faster
+	
+	# Prevent interrupting a currently playing action animation
+	var animation_name = tool_type + "_" + facing_direction
+	if sprite and sprite.is_playing() and sprite.animation == animation_name:
+		return  # Already playing the animation; skip
 
-		is_performing_action = true
-		Global.player_current_attack = true  # Set attack flag for damage detection
-		action_timer = 0.0
-		action_cooldown = 0.2  # Add a slight cooldown to prevent spamming
+	is_performing_action = true
+	Global.player_current_attack = true  # Set attack flag for damage detection
+	action_timer = 0.0
+	action_cooldown = cooldown  # Use the calculated cooldown
 
-		# Play animation once (not looping)
-		if sprite:
-			sprite.play(animation_name)
-			print("Playing animation: ", animation_name)
-			
-			# Ensure animation doesn't loop
-			if sprite.sprite_frames.has_animation(animation_name):
-				sprite.sprite_frames.set_animation_loop(animation_name, false)
-			
-		# Position and enable the action hitbox
-		position_action_hitbox()
+	# Play animation once (not looping)
+	if sprite:
+		sprite.play(animation_name)
+		print("Playing animation: ", animation_name, " with ", item_name)
 		
-		# Directly do a raycast to find what we're hitting
-		do_direct_action_check(item_name)
+		# Ensure animation doesn't loop
+		if sprite.sprite_frames.has_animation(animation_name):
+			sprite.sprite_frames.set_animation_loop(animation_name, false)
 		
-	elif item_name == "StoneSword":
-		# Use slash animations for sword
-		var animation_name = "slash_" + facing_direction
-		if sprite and sprite.is_playing() and sprite.animation == animation_name:
-			return  # Already playing the animation; skip
-			
-		is_performing_action = true
-		Global.player_current_attack = true  # Set attack flag for damage detection
-		action_timer = 0.0
-		action_cooldown = 0.3  # Slightly longer cooldown for sword
-		
-		# Play animation once
-		if sprite:
-			sprite.play(animation_name)
-			print("Playing sword animation: ", animation_name)
-			
-			# Ensure animation doesn't loop
-			if sprite.sprite_frames.has_animation(animation_name):
-				sprite.sprite_frames.set_animation_loop(animation_name, false)
-			
-		# Position and enable the action hitbox
-		position_action_hitbox()
-		
-		# If using left direction, adjust hitbox position
-		if facing_direction == "right" and sprite.flip_h:
-			# We're facing left, so make sure the hitbox is positioned correctly
-			position_action_hitbox()
-			
-	elif item_name == "StonePickaxe":
-		# Use pickaxe animations
-		var animation_name = "pickaxe_" + facing_direction
-		if sprite and sprite.is_playing() and sprite.animation == animation_name:
-			return  # Already playing the animation; skip
-			
-		is_performing_action = true
-		Global.player_current_attack = true  # Set attack flag for damage detection
-		action_timer = 0.0
-		action_cooldown = 0.25  # Cooldown for pickaxe
-		
-		# Play animation once
-		if sprite:
-			sprite.play(animation_name)
-			print("Playing pickaxe animation: ", animation_name)
-			
-			# Ensure animation doesn't loop
-			if sprite.sprite_frames.has_animation(animation_name):
-				sprite.sprite_frames.set_animation_loop(animation_name, false)
-			
-		# Position and enable the action hitbox
-		position_action_hitbox()
-		
-		# Directly do a raycast to find what we're hitting
-		do_direct_action_check(item_name)
+	# Position and enable the action hitbox
+	position_action_hitbox()
+	
+	# Directly do a raycast to find what we're hitting
+	do_direct_action_check(item_name, damage)
 
 # Do a direct raycast check to find what we're hitting
 # Update do_direct_action_check function to handle pickaxe
-func do_direct_action_check(item_name):
-	print("do_direct_action_check called with: ", item_name)
+func do_direct_action_check(item_name, damage = 1):
+	print("do_direct_action_check called with: ", item_name, " damage: ", damage)
 	
-	var hit_distance = 24.0  # Distance to check in front of player
+	var hit_distance = 32.0  # Increased distance
 	var hit_position = global_position
 	
 	# Determine direction vector based on facing direction
@@ -335,29 +341,66 @@ func do_direct_action_check(item_name):
 	# Calculate hit position
 	hit_position += direction_vector * hit_distance
 	
-	# Debug visualization
-	print("Checking direct hit at: ", hit_position)
+	print("Checking direct hit at: ", hit_position, " from player at: ", global_position)
 	
-	# Check what we're hitting with a larger radius to catch nearby objects
+	# METHOD 1: Try shape collision detection
 	var space_state = get_world_2d().direct_space_state
 	var query = PhysicsShapeQueryParameters2D.new()
 	var circle_shape = CircleShape2D.new()
-	circle_shape.radius = 12.0  # Generous radius to catch objects
+	circle_shape.radius = 20.0  # Increased radius
 	
 	query.set_shape(circle_shape)
 	query.transform = Transform2D(0, hit_position)
 	query.collision_mask = 2  # Layer 2 (hitboxes)
 	
 	var results = space_state.intersect_shape(query)
-	print("Found ", results.size(), " potential targets")
+	print("Shape query found ", results.size(), " potential targets")
 	
-	# Process hits
+	# METHOD 2: If shape query fails, try raycast
+	if results.size() == 0:
+		print("Trying raycast method...")
+		var ray_query = PhysicsRayQueryParameters2D.new()
+		ray_query.from = global_position
+		ray_query.to = hit_position
+		ray_query.collision_mask = 2  # Layer 2 (hitboxes)
+		
+		var ray_result = space_state.intersect_ray(ray_query)
+		if ray_result:
+			print("Raycast hit: ", ray_result.collider.name if ray_result.collider else "unknown")
+			results = [{"collider": ray_result.collider}]
+	
+	# METHOD 3: If both fail, try broader area search
+	if results.size() == 0:
+		print("Trying broader area search...")
+		query.collision_mask = 7  # Try layers 1, 2, and 3
+		circle_shape.radius = 30.0  # Even bigger radius
+		query.set_shape(circle_shape)
+		results = space_state.intersect_shape(query)
+		print("Broader search found ", results.size(), " targets")
+	
+	# METHOD 4: Last resort - check nearby trees directly
+	if results.size() == 0 and item_name.ends_with("Axe"):
+		print("Last resort: checking trees in group...")
+		var trees = get_tree().get_nodes_in_group("Trees")
+		for tree in trees:
+			var distance = global_position.distance_to(tree.global_position)
+			if distance < 50.0:  # Within 50 pixels
+				print("Found nearby tree: ", tree.name, " at distance: ", distance)
+				# Manually call the tree's take_damage function
+				if tree.has_method("take_damage"):
+					tree.take_damage(damage, self)
+					print("Manually damaged tree!")
+					return
+	
+	# Process normal collision results
 	for result in results:
 		var collider = result["collider"]
-
-		print("Collider found: ", collider.name, " parent: ", collider.get_parent().name)
 		
-
+		if not collider:
+			continue
+			
+		print("Collider found: ", collider.name if collider else "null", " parent: ", collider.get_parent().name if collider.get_parent() else "null")
+		
 		if collider is Area2D:
 			var parent = collider.get_parent()
 			
@@ -366,26 +409,25 @@ func do_direct_action_check(item_name):
 				continue
 				
 			print("Direct hit detected on: ", parent.name)
-
 			print("Parent groups: ", parent.get_groups())
-			print("Parent has take_damage method: ", parent.has_method("take_damage"))
-
-			# Apply damage based on item
+			
+			# Apply damage based on item type
 			if parent and parent.has_method("take_damage"):
-				if item_name == "StoneAxe" and (parent.is_in_group("Trees") or parent.name.begins_with("Tree")):
-					parent.take_damage(1, self)
-					print("Direct tree damage applied!")
-				elif item_name == "StoneSword" and parent.has_method("skeleton"):
-					parent.take_damage(35, self)
-					print("Direct skeleton damage applied!")
-				elif item_name == "StonePickaxe":
+				if item_name.ends_with("Axe") and (parent.is_in_group("Trees") or parent.name.begins_with("Tree")):
+					parent.take_damage(damage, self)
+					print("Direct tree damage applied! (", damage, " damage)")
+					return
+				elif item_name.ends_with("Sword") and parent.has_method("skeleton"):
+					parent.take_damage(damage, self)
+					print("Direct skeleton damage applied! (", damage, " damage)")
+					return
+				elif item_name.ends_with("Pickaxe"):
 					# Check if it's an ore
 					if parent.is_in_group("Ores") or parent.name.begins_with("Iron") or parent.name.begins_with("Stone") or parent.name.begins_with("Gold"):
 						print("Trying to damage ore: ", parent.name)
-						parent.take_damage(1, self)
-						print("Direct ore damage applied!")
-					else:
-						print("Object is not recognized as an ore: ", parent.name)
+						parent.take_damage(damage, self)
+						print("Direct ore damage applied! (", damage, " damage)")
+						return
 
 # Position the action hitbox in front of the player based on facing direction
 func position_action_hitbox():
