@@ -16,8 +16,6 @@ var health_component
 
 var is_cut_down = false
 var regrowth_timer = 0.0
-var player_in_range = false
-var player_ref = null
 
 func _ready():
 	add_to_group("Trees")
@@ -37,91 +35,68 @@ func _ready():
 
 	if tree_trunk:
 		tree_trunk.visible = false
-	
-	# Connect hitbox signals to track when player is in range
-	if hitbox_component:
-		if not hitbox_component.body_entered.is_connected(_on_hitbox_body_entered):
-			hitbox_component.body_entered.connect(_on_hitbox_body_entered)
-		if not hitbox_component.body_exited.is_connected(_on_hitbox_body_exited):
-			hitbox_component.body_exited.connect(_on_hitbox_body_exited)
-		
-		# Make sure hitbox is configured to detect player
-		hitbox_component.collision_mask |= 1  # Layer 1 (player)
-		print("Tree: Hitbox signals connected")
+
+	print("TREE DEBUG: Tree ", self.name, " initialized at position ", global_position)
 
 func _process(delta):
 	if is_cut_down:
 		regrowth_timer += delta
 		if regrowth_timer >= regrowth_time:
 			regrow_tree()
-	
-	# NEW: Check for damage from the player's current action
-	if player_in_range and player_ref and player_ref.is_performing_action:
-		var equipped_item = player_ref.get_equipped_item()
-		# Check if player is using ANY type of axe
-		if equipped_item.ends_with("Axe") and Global.player_current_attack:
-			print("Tree detected axe attack from: ", equipped_item)
-			
-			# Calculate damage based on axe type
-			var damage = 1
-			if equipped_item == "IronAxe":
-				damage = 2  # Iron axe cuts faster
-			elif equipped_item == "GoldAxe":
-				damage = 1  # Gold axe same damage but faster cooldown (handled in player)
-			
-			take_damage(damage, player_ref)
-			Global.player_current_attack = false  # Reset to prevent multiple hits
-
-# NEW: Hitbox signal handlers
-func _on_hitbox_body_entered(body):
-	print("Tree: Body entered hitbox - " + body.name)
-	if body.is_in_group("Player") or body.has_method("player"):
-		player_in_range = true
-		player_ref = body
-		print("Tree: Player in range")
-
-func _on_hitbox_body_exited(body):
-	print("Tree: Body exited hitbox - " + body.name)
-	if body.is_in_group("Player") or body.has_method("player"):
-		player_in_range = false
-		player_ref = null
-		print("Tree: Player out of range")
 
 func take_damage(damage_amount: int = 1, damager = null):
-	print("Tree take_damage called with damage: ", damage_amount)
+	print("TREE DEBUG: take_damage called on ", self.name)
+	print("TREE DEBUG: - damage_amount: ", damage_amount)
+	print("TREE DEBUG: - damager: ", damager.name if damager else "null")
 
 	if is_cut_down:
-		print("Tree already cut down")
+		print("TREE DEBUG: Tree already cut down")
 		return
 
-	# If no damager is provided, use the player_ref
+	# Get the player if damager is null
 	if damager == null:
-		damager = player_ref
+		damager = get_tree().get_first_node_in_group("Player")
+		print("TREE DEBUG: Found player from group: ", damager.name if damager else "null")
 
-	if damager == null or not damager.is_in_group("Player"):
-		print("Invalid damager")
+	if damager == null:
+		print("TREE DEBUG: No damager found")
 		return
 
+	if not damager.is_in_group("Player"):
+		print("TREE DEBUG: Damager is not a player")
+		return
+
+	# Check if player is actually performing an action
+	print("TREE DEBUG: Player is_performing_action: ", damager.is_performing_action)
 	if not damager.is_performing_action:
-		print("Player not performing action")
+		print("TREE DEBUG: Player not performing action - no damage applied")
 		return
-	
-	# NEW: Check if player is using an axe
+
+	# Check distance to player
+	var distance = damager.global_position.distance_to(global_position)
+	print("TREE DEBUG: Distance to player: ", distance)
+	if distance > 30.0:
+		print("TREE DEBUG: Player too far away: ", distance)
+		return
+
+	# Check if player is using an axe
 	var equipped_item = damager.get_equipped_item()
+	print("TREE DEBUG: Player equipped item: '", equipped_item, "'")
 	if not equipped_item.ends_with("Axe"):
-		print("Not being chopped with an axe")
-		# Give feedback that an axe is needed
+		print("TREE DEBUG: Not being chopped with an axe")
 		_show_wrong_tool_effect()
 		return
 
-	print("Tree: Taking damage: ", damage_amount, " from ", equipped_item)
+	print("TREE DEBUG: ✓ All checks passed! Applying ", damage_amount, " damage from ", equipped_item)
 
 	if health_component:
 		health_component.take_damage(damage_amount)
+		print("TREE DEBUG: Health component health: ", health_component.current_health, "/", health_component.max_health)
 		if health_component.current_health <= 0 and not is_cut_down:
 			cut_down_tree()
 	else:
 		current_health -= damage_amount
+		print("TREE DEBUG: Direct health: ", current_health, "/", max_health)
 		if current_health <= 0 and not is_cut_down:
 			cut_down_tree()
 
@@ -132,6 +107,7 @@ func cut_down_tree():
 	if is_cut_down:
 		return
 
+	print("TREE DEBUG: *** TREE BEING CUT DOWN! ***")
 	is_cut_down = true
 	regrowth_timer = 0.0
 
@@ -193,7 +169,7 @@ func regrow_tree():
 		hitbox_component.set_deferred("monitoring", true)
 		hitbox_component.set_deferred("monitorable", true)
 		hitbox_component.set_deferred("collision_layer", 2)
-		hitbox_component.set_deferred("collision_mask", 3)  # Layer 1 (player) + 2 (hitbox)
+		hitbox_component.set_deferred("collision_mask", 2)
 		for child in hitbox_component.get_children():
 			if child is CollisionShape2D or child is CollisionPolygon2D:
 				child.set_deferred("disabled", false)
@@ -226,12 +202,13 @@ func _drop_resources():
 			get_parent().add_child(wood)
 
 func _show_damage_effect():
+	print("TREE DEBUG: Showing damage effect")
 	var tween = create_tween()
 	tween.tween_property(self, "modulate", Color(1, 0.5, 0.5), 0.1)
 	tween.tween_property(self, "modulate", Color(1, 1, 1), 0.1)
 
-# NEW: Visual feedback when wrong tool is used
 func _show_wrong_tool_effect():
+	print("TREE DEBUG: Showing wrong tool effect")
 	var tween = create_tween()
 	tween.tween_property(self, "modulate", Color(0.5, 0.5, 1), 0.1)
 	tween.tween_property(self, "modulate", Color(1, 1, 1), 0.1)
@@ -241,4 +218,4 @@ func _show_regrowth_effect():
 	modulate = Color(0.7, 1.0, 0.7, 0.7)
 	var tween = create_tween()
 	tween.tween_property(self, "scale", Vector2(1, 1), 0.5).set_trans(Tween.TRANS_ELASTIC)
-	tween.parallel().tween_property(self, "modulate", Color(1, 1, 1, 1), 0.5)
+	tween.parallel().tween_property(self, "modulate", Color(1, 1, 1, 1), 0.5)      
