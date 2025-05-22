@@ -117,6 +117,11 @@ func trigger_pickup(collector = null):
 	emit_signal("item_picked_up", item_data)
 	print("Item picked up: ", item_data.name, " x", item_data.quantity)
 	
+	# Check if this is a Crystal - special win condition item
+	if item_data.name == "Crystal":
+		print("DEBUG: Crystal picked up - triggering win condition!")
+		# The player's inventory_updated signal will handle the win condition
+	
 	# Special handling for Crystal items
 	if item_data.name == "Crystal":
 		# Hide any reward sprites in hidden locations

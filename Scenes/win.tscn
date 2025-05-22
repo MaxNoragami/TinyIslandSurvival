@@ -1,10 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://brei3tff61c34"]
+[gd_scene load_steps=9 format=3 uid="uid://s7hbywdbb4dy"]
 
-[ext_resource type="FontFile" uid="uid://dylhu0n40j0n" path="res://Assets/Daydream.ttf" id="1_8fo1c"]
-[ext_resource type="Script" uid="uid://cplwaxi75hih1" path="res://Scripts/game_over.gd" id="1_m5628"]
+[ext_resource type="FontFile" uid="uid://dylhu0n40j0n" path="res://Assets/Daydream.ttf" id="1_3mm25"]
+[ext_resource type="Script" uid="uid://qsaaccroeiqn" path="res://Scripts/win.gd" id="2_3mm25"]
 
 [sub_resource type="Theme" id="Theme_ek8ke"]
-default_font = ExtResource("1_8fo1c")
+default_font = ExtResource("1_3mm25")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k52d1"]
 bg_color = Color(0, 0, 0, 1)
@@ -48,7 +48,7 @@ _data = {
 &"show": SubResource("Animation_14u15")
 }
 
-[node name="GameOver" type="Control" node_paths=PackedStringArray("visible_ui", "animation_player")]
+[node name="Win" type="Control" node_paths=PackedStringArray("visible_ui", "animation_player")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -56,7 +56,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme = SubResource("Theme_ek8ke")
-script = ExtResource("1_m5628")
+script = ExtResource("2_3mm25")
 visible_ui = NodePath("Panel")
 animation_player = NodePath("AnimationPlayer")
 
@@ -77,16 +77,17 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -301.0
-offset_top = -48.0
-offset_right = 399.0
-offset_bottom = 60.0
+offset_left = -345.0
+offset_top = -39.0
+offset_right = 355.0
+offset_bottom = 69.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_fonts/normal_font = ExtResource("1_8fo1c")
+theme_override_fonts/normal_font = ExtResource("1_3mm25")
 theme_override_font_sizes/normal_font_size = 66
 bbcode_enabled = true
-text = "[rainbow freq=1 sat=0.7 val=0.8][wave amp=50.0 freq=5.0 connected=1]GAME OVER"
+text = "[rainbow freq=1 sat=0.7 val=0.8][wave amp=50.0 freq=5.0 connected=1]YOU WIN"
+horizontal_alignment = 1
 custom_effects = [SubResource("RichTextEffect_eoghk")]
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]

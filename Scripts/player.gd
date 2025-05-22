@@ -642,6 +642,13 @@ func get_inventory():
 # Forward the inventory updated signal
 func _on_inventory_updated():
 	emit_signal("inventory_updated")
+	
+	# Check for Crystal win condition
+	if has_item("Crystal"):
+		# Find the win system and trigger the win condition
+		var win_system = get_tree().get_first_node_in_group("WinScreen")
+		if win_system and win_system.has_method("_on_game_win"):
+			win_system._on_game_win()
 
 func _on_hitbox_component_body_entered(body):
 	print("Body entered hitbox: ", body.name)

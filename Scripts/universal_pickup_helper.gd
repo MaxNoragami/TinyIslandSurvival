@@ -139,6 +139,12 @@ func pickup_nearest_item():
 			if player.has_method("add_to_inventory"):
 				var success = player.add_to_inventory("Crystal", 1)
 				print("Added Crystal to inventory: " + str(success))
+				
+				# Check for win system - this is a fallback in case the player's inventory_updated
+				# signal doesn't catch it
+				var win_system = tree.get_first_node_in_group("WinScreen")
+				if win_system and win_system.has_method("_on_game_win"):
+					win_system._on_game_win()
 			
 			# Queue free the crystal
 			found_crystal.queue_free()

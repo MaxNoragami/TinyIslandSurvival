@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://erd5qpm8sraw"]
+[gd_scene load_steps=23 format=3 uid="uid://erd5qpm8sraw"]
 
 [ext_resource type="PackedScene" uid="uid://biuw3yy44r8vd" path="res://Scenes/inventory_ui.tscn" id="1_3dryh"]
 [ext_resource type="PackedScene" uid="uid://x4w6s15w1q3" path="res://Scenes/world.tscn" id="1_ebmjs"]
@@ -6,20 +6,21 @@
 [ext_resource type="PackedScene" uid="uid://cpboxjdnfs5u2" path="res://Scenes/player.tscn" id="2_qxrlw"]
 [ext_resource type="PackedScene" uid="uid://brei3tff61c34" path="res://Scenes/game_over.tscn" id="3_1phco"]
 [ext_resource type="PackedScene" uid="uid://mpfurnu554th" path="res://Scenes/wood.tscn" id="3_wrm1d"]
+[ext_resource type="PackedScene" uid="uid://s7hbywdbb4dy" path="res://Scenes/win.tscn" id="4_7t8sx"]
 [ext_resource type="PackedScene" uid="uid://ci5syb8ys8yes" path="res://Scenes/tree.tscn" id="5_wowpa"]
 [ext_resource type="Script" uid="uid://cxf765vmr58vu" path="res://Scripts/tree_spawner.gd" id="6_8128m"]
 [ext_resource type="PackedScene" uid="uid://dipv4rh4v4p32" path="res://Scenes/rock.tscn" id="6_h4fw4"]
 [ext_resource type="Script" uid="uid://bkvpboislfeik" path="res://Scripts/ore_spawner.gd" id="7_1l0tm"]
 [ext_resource type="PackedScene" uid="uid://4qgoaa3ivu3f" path="res://Scenes/stone_axe.tscn" id="7_ldgsr"]
 [ext_resource type="PackedScene" uid="uid://cpva6ufsf0e4a" path="res://Scenes/stone_sword.tscn" id="8_rku1e"]
-[ext_resource type="Script" uid="uid://jk4y3t3rplve" path="res://Scenes/runestone.gd" id="10_vm72l"]
+[ext_resource type="Script" uid="uid://jk4y3t3rplve" path="res://Scripts/runestone.gd" id="10_vm72l"]
 [ext_resource type="Script" uid="uid://jsd6o8omlw5a" path="res://Scripts/pickup_component.gd" id="11_22asu"]
 [ext_resource type="Texture2D" uid="uid://qf2utkjrpxiq" path="res://Assets/Outdoor decoration/ancient_tablet.png" id="11_fkdbe"]
 [ext_resource type="PackedScene" uid="uid://qilno75ul2ds" path="res://Scenes/skeleton.tscn" id="11_o5yvi"]
-[ext_resource type="Script" uid="uid://dkkqpoqevnu5j" path="res://Scenes/enemy_spawn.gd" id="13_rfjv2"]
-[ext_resource type="Script" uid="uid://5uuf5mhdrmct" path="res://Scenes/debug_helper.gd" id="15_nb51f"]
-[ext_resource type="Script" uid="uid://bm4pfme2tntb8" path="res://Scenes/universal_pickup_helper.gd" id="16_nnt18"]
-[ext_resource type="Script" uid="uid://d0l7evypjg47g" path="res://Scenes/inventory_fix_helper.gd" id="17_ewbju"]
+[ext_resource type="Script" uid="uid://dkkqpoqevnu5j" path="res://Scripts/enemy_spawn.gd" id="13_rfjv2"]
+[ext_resource type="Script" uid="uid://5uuf5mhdrmct" path="res://Scripts/debug_helper.gd" id="15_nb51f"]
+[ext_resource type="Script" uid="uid://bm4pfme2tntb8" path="res://Scripts/universal_pickup_helper.gd" id="16_nnt18"]
+[ext_resource type="Script" uid="uid://d0l7evypjg47g" path="res://Scripts/inventory_fix_helper.gd" id="17_ewbju"]
 [ext_resource type="PackedScene" uid="uid://cpcr4k85tk75x" path="res://Scenes/CrystalCave.tscn" id="21_exi56"]
 
 [node name="Game" type="Node"]
@@ -32,6 +33,8 @@ metadata/_edit_lock_ = true
 [node name="CraftMenu" parent="CanvasLayer" instance=ExtResource("2_i6g32")]
 
 [node name="GameOver" parent="CanvasLayer" instance=ExtResource("3_1phco")]
+
+[node name="Win" parent="CanvasLayer" instance=ExtResource("4_7t8sx")]
 
 [node name="World" parent="." instance=ExtResource("1_ebmjs")]
 position = Vector2(23, -12)
