@@ -34,6 +34,7 @@ metadata/_edit_lock_ = true
 [node name="CraftMenu" parent="CanvasLayer" instance=ExtResource("2_i6g32")]
 
 [node name="HealthBar" parent="CanvasLayer" instance=ExtResource("3_mg4q0")]
+mouse_filter = 2
 
 [node name="GameOver" parent="CanvasLayer" instance=ExtResource("3_1phco")]
 
