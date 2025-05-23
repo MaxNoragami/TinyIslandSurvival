@@ -185,6 +185,11 @@ func regrow_tree():
 	print("Tree regrown!")
 
 func _drop_resources():
+	# Play the tree chopped sound effect when destroyed
+	var chopped_sound = get_node_or_null("Chopped")
+	if chopped_sound:
+		chopped_sound.play()
+
 	var wood_count = randi_range(wood_drop_min, wood_drop_max)
 	var wood_scene = load("res://Scenes/wood.tscn")
 	if not wood_scene:
@@ -203,6 +208,16 @@ func _drop_resources():
 
 func _show_damage_effect():
 	print("TREE DEBUG: Showing damage effect")
+	
+	# Play wood chopping sound effect
+	var player = get_tree().get_first_node_in_group("Player")
+	if player:
+		var equipped_item = player.get_equipped_item()
+		if equipped_item.ends_with("Axe"):
+			var wood_chop_sound = player.get_node_or_null("Sounds/WoodChop")
+			if wood_chop_sound:
+				wood_chop_sound.play()
+	
 	var tween = create_tween()
 	tween.tween_property(self, "modulate", Color(1, 0.5, 0.5), 0.1)
 	tween.tween_property(self, "modulate", Color(1, 1, 1), 0.1)
@@ -218,4 +233,4 @@ func _show_regrowth_effect():
 	modulate = Color(0.7, 1.0, 0.7, 0.7)
 	var tween = create_tween()
 	tween.tween_property(self, "scale", Vector2(1, 1), 0.5).set_trans(Tween.TRANS_ELASTIC)
-	tween.parallel().tween_property(self, "modulate", Color(1, 1, 1, 1), 0.5)      
+	tween.parallel().tween_property(self, "modulate", Color(1, 1, 1, 1), 0.5)

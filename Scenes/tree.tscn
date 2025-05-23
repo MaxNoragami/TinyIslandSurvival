@@ -1,10 +1,11 @@
-[gd_scene load_steps=8 format=3 uid="uid://ci5syb8ys8yes"]
+[gd_scene load_steps=9 format=3 uid="uid://ci5syb8ys8yes"]
 
 [ext_resource type="Texture2D" uid="uid://boaf7dwygdh42" path="res://Assets/Outdoor decoration/Oak_Tree.png" id="1_nnvrw"]
 [ext_resource type="Script" uid="uid://dn7al0ge7nn5y" path="res://Scripts/hitbox_component.gd" id="2_gvmkm"]
 [ext_resource type="Texture2D" uid="uid://d1nmuc8kutr6g" path="res://Assets/Outdoor decoration/Outdoor_Decor_Free.png" id="2_l3oha"]
 [ext_resource type="Script" uid="uid://dry5ni6xjdkby" path="res://Scripts/health_component.gd" id="3_gvmkm"]
 [ext_resource type="Script" uid="uid://didxwl1at6mqe" path="res://Scripts/tree.gd" id="4_gvmkm"]
+[ext_resource type="AudioStream" uid="uid://cbkomet70cm30" path="res://Sound/qubodupImpactMeat01.ogg" id="6_q8wpw"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_l7sa7"]
 radius = 8.0
@@ -65,3 +66,7 @@ metadata/_custom_type_script = "uid://dry5ni6xjdkby"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TrunkCollision"]
 shape = SubResource("CapsuleShape2D_l3oha")
+
+[node name="Chopped" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("6_q8wpw")
+volume_db = -0.8

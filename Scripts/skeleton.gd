@@ -70,6 +70,12 @@ func die():
 	if not death_animation_played and $AnimatedSprite2D.sprite_frames.has_animation("death"):
 		$AnimatedSprite2D.play("death")
 		death_animation_played = true
+	
+	# Play death sound starting from 0.7 seconds
+	var death_sound = get_node_or_null("Death")
+	if death_sound:
+		death_sound.play(0.7)  # Start playback from 0.7 seconds
+	
 	$death_cleanup_timer.start()
 	# Signal emission is fine here - this will notify the spawner
 	emit_signal("enemy_died")
@@ -85,6 +91,19 @@ func _on_hitbox_component_body_exited(body: Node2D) -> void:
 func deal_with_damage():
 	if player_inattack_zone and Global.player_current_attack == true:
 		if can_take_damage == true:
+			# Play skeleton hit sound effect when hit by player weapons
+			var player_node = get_tree().get_first_node_in_group("Player")
+			if player_node:
+				var equipped_item = player_node.get_equipped_item()
+				# Check if player is using any weapon (sword, axe, or pickaxe) - any variant
+				if (equipped_item.ends_with("Sword") or 
+					equipped_item.ends_with("Axe") or 
+					equipped_item.ends_with("Pickaxe")):
+					var skeleton_hit_sound = player_node.get_node_or_null("Sounds/SkeletonHit")
+					if skeleton_hit_sound:
+						skeleton_hit_sound.play()
+						print("Playing SkeletonHit sound for weapon: ", equipped_item)
+			
 			if health > 0:
 				_show_damage_effect()
 			health = health - 20
@@ -110,3 +129,4 @@ func _show_damage_effect():
 	var tween = create_tween()
 	tween.tween_property(self, "modulate", Color(1, 0.5, 0.5), 0.1)
 	tween.tween_property(self, "modulate", Color(1, 1, 1), 0.1)
+

@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://erd5qpm8sraw"]
+[gd_scene load_steps=25 format=3 uid="uid://erd5qpm8sraw"]
 
 [ext_resource type="PackedScene" uid="uid://biuw3yy44r8vd" path="res://Scenes/inventory_ui.tscn" id="1_3dryh"]
 [ext_resource type="PackedScene" uid="uid://x4w6s15w1q3" path="res://Scenes/world.tscn" id="1_ebmjs"]
@@ -23,6 +23,7 @@
 [ext_resource type="Script" uid="uid://bm4pfme2tntb8" path="res://Scripts/universal_pickup_helper.gd" id="16_nnt18"]
 [ext_resource type="Script" uid="uid://d0l7evypjg47g" path="res://Scripts/inventory_fix_helper.gd" id="17_ewbju"]
 [ext_resource type="PackedScene" uid="uid://cpcr4k85tk75x" path="res://Scenes/CrystalCave.tscn" id="21_exi56"]
+[ext_resource type="AudioStream" uid="uid://c06eqpprcyal4" path="res://Sound/AmbientNatureOutside.ogg" id="24_vm72l"]
 
 [node name="Game" type="Node"]
 
@@ -34,7 +35,6 @@ metadata/_edit_lock_ = true
 [node name="CraftMenu" parent="CanvasLayer" instance=ExtResource("2_i6g32")]
 
 [node name="HealthBar" parent="CanvasLayer" instance=ExtResource("3_mg4q0")]
-mouse_filter = 2
 
 [node name="GameOver" parent="CanvasLayer" instance=ExtResource("3_1phco")]
 
@@ -121,3 +121,8 @@ script = ExtResource("17_ewbju")
 
 [node name="CrystalCave" parent="." instance=ExtResource("21_exi56")]
 position = Vector2(-94, 46)
+
+[node name="Ambient" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("24_vm72l")
+volume_db = 24.0
+autoplay = true

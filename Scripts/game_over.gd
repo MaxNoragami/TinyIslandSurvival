@@ -41,3 +41,15 @@ func _on_show_timer_timeout():
 	# Optionally play a fade-in animation
 	if animation_player and animation_player.has_animation("show"):
 		animation_player.play("show")
+
+func _input(event):
+	# Only handle input when the game over screen is visible
+	if not visible or not visible_ui or not visible_ui.visible:
+		return
+		
+	if event.is_action_pressed("reset_game"):
+		restart_game()
+
+func restart_game():
+	print("Restarting game from Game Over screen...")
+	get_tree().reload_current_scene()

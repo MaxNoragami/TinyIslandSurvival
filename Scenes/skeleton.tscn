@@ -1,8 +1,9 @@
-[gd_scene load_steps=36 format=3 uid="uid://qilno75ul2ds"]
+[gd_scene load_steps=37 format=3 uid="uid://qilno75ul2ds"]
 
 [ext_resource type="Script" uid="uid://d2764vl5p8s6c" path="res://Scripts/skeleton.gd" id="1_81u3t"]
 [ext_resource type="Texture2D" uid="uid://cmd4eyj0kh4md" path="res://Assets/Enemies/Skeleton.png" id="2_r6xse"]
 [ext_resource type="Script" uid="uid://dn7al0ge7nn5y" path="res://Scripts/hitbox_component.gd" id="3_vd5x3"]
+[ext_resource type="AudioStream" uid="uid://dn38v6i6fpg57" path="res://Sound/skeleton_death.wav" id="4_pegji"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_81u3t"]
 atlas = ExtResource("2_r6xse")
@@ -273,6 +274,9 @@ wait_time = 3.0
 
 [node name="take_damage_cooldown" type="Timer" parent="."]
 wait_time = 0.935
+
+[node name="Death" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4_pegji")
 
 [connection signal="body_entered" from="AnimatedSprite2D/detection_area" to="." method="_on_detection_area_body_entered"]
 [connection signal="body_exited" from="AnimatedSprite2D/detection_area" to="." method="_on_detection_area_body_exited"]

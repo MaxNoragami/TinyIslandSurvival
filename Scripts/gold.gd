@@ -280,6 +280,15 @@ func _drop_resources():
 
 # Visual effects for feedback
 func _show_damage_effect():
+	# Play ore mining sound effect
+	var player = get_tree().get_first_node_in_group("Player")
+	if player:
+		var equipped_item = player.get_equipped_item()
+		if equipped_item.ends_with("Pickaxe"):
+			var ore_mine_sound = player.get_node_or_null("Sounds/OreMine")
+			if ore_mine_sound:
+				ore_mine_sound.play()
+	
 	var tween = create_tween()
 	tween.tween_property(self, "modulate", Color(1, 0.5, 0.5), 0.1)
 	tween.tween_property(self, "modulate", Color(1, 1, 1), 0.1)
